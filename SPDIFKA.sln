@@ -13,6 +13,7 @@ Global
 		{AEE5B35A-042B-4379-AD61-1B2D52C8999C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AEE5B35A-042B-4379-AD61-1B2D52C8999C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AEE5B35A-042B-4379-AD61-1B2D52C8999C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AEE5B35A-042B-4379-AD61-1B2D52C8999C}.Release|Any CPU.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
