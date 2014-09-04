@@ -14,7 +14,6 @@ namespace SPDIFKA
     {
         private Boolean isSoundStarted = false;
         private SoundPlayer sound;
-        private static String soundLocation = "..\\..\\media\\silence.wav";
         private static AudioControl instance;
 
         private AudioControl() { }
@@ -40,18 +39,10 @@ namespace SPDIFKA
         public void start()
         {
 
-            if (File.Exists(soundLocation))
-            {
-                sound = new SoundPlayer();
-                sound.SoundLocation = soundLocation;
-                sound.LoadCompleted += new AsyncCompletedEventHandler(wavPlayer_LoadCompleted);
-                sound.LoadAsync();
-                isSoundStarted = true;
-            }
-            else
-            {
-                MessageBox.Show("Audio File Not Found", "Error", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-            }
+            sound = new SoundPlayer(Properties.Resources.silence);
+            sound.LoadCompleted += new AsyncCompletedEventHandler(wavPlayer_LoadCompleted);
+            sound.LoadAsync();
+            isSoundStarted = true;
         }
         
         /// <summary>
