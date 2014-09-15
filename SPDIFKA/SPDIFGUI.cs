@@ -44,6 +44,14 @@ namespace SPDIFKA
         }
 
         /// <summary>
+        /// General destructor
+        /// </summary>
+        public ~SPDIFKAGUI()
+        {
+            this.Resize -= new System.EventHandler(this.Form1_Resize);
+        }
+
+        /// <summary>
         /// Start and Stop button for changing the audio state of this tool.
         /// </summary>
         /// <param name="sender"></param>
@@ -51,7 +59,7 @@ namespace SPDIFKA
         private void button1_Click(object sender, EventArgs e)
         {
             manageStartStop();
-        }
+        }        
 
         /// <summary>
         /// Resize event to manage the windows tool bar functionality.
