@@ -1,13 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SPDIFKA
@@ -19,11 +10,11 @@ namespace SPDIFKA
         private static String startMessage = "running...";
         private static String toolStripStartText = "Start " + name;
         private static String toolStripStopText = "Stop " + name;
+
         private static String version = System.Reflection.Assembly.GetExecutingAssembly()
                                            .GetName()
                                            .Version
                                            .ToString();
-
 
         /// <summary>
         /// General initialization.
@@ -40,7 +31,6 @@ namespace SPDIFKA
             this.Resize += new System.EventHandler(this.Form1_Resize);
             runningLabel.Text = stoppedMessage;
             FormBorderStyle = FormBorderStyle.FixedSingle;
-
         }
 
         /// <summary>
@@ -59,7 +49,7 @@ namespace SPDIFKA
         private void startButton_Click(object sender, EventArgs e)
         {
             manageStartStop();
-        }        
+        }
 
         /// <summary>
         /// Resize event to manage the windows tool bar functionality.
@@ -141,8 +131,5 @@ namespace SPDIFKA
                 AudioControl.Instance.stop();
             }
         }
-
-
-
     }
 }
