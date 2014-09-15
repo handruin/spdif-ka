@@ -1,13 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.IO;
-using System.Linq;
-using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace SPDIFKA
@@ -19,11 +10,11 @@ namespace SPDIFKA
         private static String startMessage = "running...";
         private static String toolStripStartText = "Start " + name;
         private static String toolStripStopText = "Stop " + name;
+
         private static String version = System.Reflection.Assembly.GetExecutingAssembly()
                                            .GetName()
                                            .Version
                                            .ToString();
-
 
         /// <summary>
         /// General initialization.
@@ -40,7 +31,14 @@ namespace SPDIFKA
             this.Resize += new System.EventHandler(this.Form1_Resize);
             runningLabel.Text = stoppedMessage;
             FormBorderStyle = FormBorderStyle.FixedSingle;
+        }
 
+        /// <summary>
+        /// General destructor
+        /// </summary>
+        public ~SPDIFKAGUI()
+        {
+            this.Resize -= new System.EventHandler(this.Form1_Resize);
         }
 
         /// <summary>
@@ -48,7 +46,7 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private void startButton_Click(object sender, EventArgs e)
         {
             manageStartStop();
         }
@@ -133,8 +131,5 @@ namespace SPDIFKA
                 AudioControl.Instance.stop();
             }
         }
-
-
-
     }
 }
