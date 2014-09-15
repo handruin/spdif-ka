@@ -38,11 +38,9 @@ namespace SPDIFKA
         /// </summary>
         public void start()
         {
-
             sound = new SoundPlayer(Properties.Resources.silence);
             sound.LoadCompleted += new AsyncCompletedEventHandler(wavPlayer_LoadCompleted);
             sound.LoadAsync();
-            isSoundStarted = true;
         }
         
         /// <summary>
@@ -50,9 +48,13 @@ namespace SPDIFKA
         /// </summary>
         public void stop()
         {
-            this.sound.Stop();            
-            sound.Dispose();
-            sound = null;
+            //Make sure we don't try to call Stop on a null object.
+            if(this.sound != null)
+            {
+                this.sound.Stop();
+                sound.Dispose();
+                sound = null;
+            }
             isSoundStarted = false;
         }
 

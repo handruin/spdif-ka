@@ -25,7 +25,7 @@ namespace SPDIFKA
             this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.notifyIcon.BalloonTipText = name + " - " + stoppedMessage;
             this.notifyIcon.BalloonTipTitle = name;
-            this.notifyIcon.Text = name;
+            
             toolStripStart.Text = toolStripStartText;
             this.notifyIcon.ContextMenuStrip = contextMenuStrip1;
             this.Resize += new System.EventHandler(this.Form1_Resize);
@@ -36,7 +36,7 @@ namespace SPDIFKA
         /// <summary>
         /// General destructor
         /// </summary>
-        public ~SPDIFKAGUI()
+        ~SPDIFKAGUI()
         {
             this.Resize -= new System.EventHandler(this.Form1_Resize);
         }
@@ -116,6 +116,7 @@ namespace SPDIFKA
         {
             if (!AudioControl.Instance.isRunning())
             {
+                this.notifyIcon.Text = name + " - " + startMessage;
                 toolStripStart.Text = toolStripStopText;
                 runningLabel.Text = startMessage;
                 this.notifyIcon.BalloonTipText = name + " - " + startMessage;
@@ -124,6 +125,7 @@ namespace SPDIFKA
             }
             else
             {
+                this.notifyIcon.Text = name + " - " + stoppedMessage;
                 startStopButton.Text = "start";
                 toolStripStart.Text = toolStripStartText;
                 runningLabel.Text = stoppedMessage;
