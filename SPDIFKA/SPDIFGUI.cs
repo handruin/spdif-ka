@@ -56,7 +56,7 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void button1_Click(object sender, EventArgs e)
+        private void startButton_Click(object sender, EventArgs e)
         {
             manageStartStop();
         }        
