@@ -1,8 +1,19 @@
-spdif-ka
-========
+### SPDIF Keep Alive utility (spdif-ka)
+Windows-based .net GUI application used for keeping the [S/PDIF](http://en.wikipedia.org/?title=S/PDIF) connection alive when no sound is playing.
 
-SPDIF Keep Alive utility
+Some sound cards will stop the S/PDIF link when no sound is actively being played.  When a sound is eventually played, there is roughly a 500ms delay in reconnecting the link thereby causing some audio sounds to be missed or a perceived cutoff of sound.  By running spdif-ka, this problem no longer ocurres.   
 
-This is a windows-based .net GUI application that is used for a very specific task of keeping the SPDIF connection active.  This is designed to resolve a delay issue when there are no sounds being transmitted over the link which causes some sound cards and receivers/DACs to stop the link.  When a sound is eventually played, there is roughly a 500ms delay in reconnecting the link thereby causing some audio sounds to be missed.
+### How to workaround the issue
+This utility plays a mono-channel WAV file which contains no sound.  This tricks the sounds card and/or Windows mixer into opening the audio connection to the receiver/DAC via the S/PDIF link.  With this tool running, you will no longer have a delay.
 
-This utility plays a mono-channel WAV file with no sound which tricks the sounds card and mixer in windows into opening the audio connection to the receiver/DAC via the SPDIF link.
+### Known issues
+- If you use utilities like foobar200 with a WASAPI plugin, you may encounter some strange behaviour with this tool.  
+
+### Tested platforms
+- At this time, spdif-ka has only been tested under Windows 8.1 64-bit using the .net framework 4.5.
+
+### Ways to help
+- **Fix bugs, add features.** Fix an **[open issue](https://github.com/handruin/spdif-ka/issues?state=open)** on this repo. This spdif-ka utility is an Open Source Project.  Please contribute by recommend enhancements, writing code, testing, fixing bugs, etc.
+- **Donations.** If you would like to support with a donation: 
+  - Bitcoin address:  *12c9ox5o9NekSf1AYD6x6tzAYCvvNgCUGp*
+  - Dogecoin address: *DGckZfy5Qh3tTYw1E44NCCanZKQ6gMVtiK*
