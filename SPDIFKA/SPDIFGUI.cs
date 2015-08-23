@@ -61,7 +61,6 @@ namespace SPDIFKA
             if (this.WindowState == FormWindowState.Minimized)
             {
                 notifyIcon.Visible = true;
-                notifyIcon.ShowBalloonTip(2500);
                 this.ShowInTaskbar = false;
                 this.Hide();
             }
@@ -74,10 +73,13 @@ namespace SPDIFKA
         /// <param name="e"></param>
         private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
-            this.WindowState = FormWindowState.Normal;
-            this.ShowInTaskbar = true;
-            notifyIcon.Visible = false;
-            this.Show();
+            if (e.Button.Equals(MouseButtons.Left))
+            {
+                this.WindowState = FormWindowState.Normal;
+                this.ShowInTaskbar = true;
+                notifyIcon.Visible = false;
+                this.Show();
+            }
         }
 
         /// <summary>
@@ -108,7 +110,7 @@ namespace SPDIFKA
         /// <param name="e"></param>
         private void toolStripAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Copyright 2014 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Copyright 2015 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
