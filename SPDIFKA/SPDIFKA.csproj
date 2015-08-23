@@ -73,6 +73,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -94,6 +95,7 @@
     </Compile>
     <Compile Include="SPDIFKA.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UserPreferences.cs" />
     <EmbeddedResource Include="SPDIFGUI.resx">
       <DependentUpon>SPDIFGUI.cs</DependentUpon>
     </EmbeddedResource>

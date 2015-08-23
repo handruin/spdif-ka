@@ -15,6 +15,7 @@ namespace SPDIFKA
                                            .GetName()
                                            .Version
                                            .ToString();
+        private static UserPreferences UserPerfs = new UserPreferences();
 
         /// <summary>
         /// General initialization.
@@ -22,6 +23,7 @@ namespace SPDIFKA
         public SPDIFKAGUI()
         {
             InitializeComponent();
+
             this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.notifyIcon.BalloonTipText = name + " - " + stoppedMessage;
             this.notifyIcon.BalloonTipTitle = name;
@@ -31,6 +33,37 @@ namespace SPDIFKA
             this.Resize += new System.EventHandler(this.Form1_Resize);
             runningLabel.Text = stoppedMessage;
             FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.loadState();
+        }
+
+        private bool allowVisible;     // ContextMenu's Show command used
+        protected override void SetVisibleCore(bool value)
+        {
+            //if (!allowVisible)
+            //{
+            //    value = false;
+            //    if (!this.IsHandleCreated) CreateHandle();
+            //}
+            base.SetVisibleCore(value);
+        }
+
+        private void loadState()
+        {
+
+            if (UserPerfs.IsHidden)
+            {
+                this.minimize();
+            }
+            else
+            {
+                this.restore();
+            }
+
+            if (UserPerfs.IsRunning)
+            {
+                manageStartStop();
+            }
+
         }
 
         /// <summary>
@@ -60,10 +93,27 @@ namespace SPDIFKA
         {
             if (this.WindowState == FormWindowState.Minimized)
             {
-                notifyIcon.Visible = true;
-                this.ShowInTaskbar = false;
-                this.Hide();
+                this.minimize();
             }
+        }
+
+        private void minimize()
+        {
+            notifyIcon.Visible = true;
+            this.ShowInTaskbar = false;
+            this.Hide();
+            UserPerfs.IsHidden = true;
+            this.SetVisibleCore(false);
+        }
+
+        private void restore()
+        {
+            this.WindowState = FormWindowState.Normal;
+            this.ShowInTaskbar = true;
+            notifyIcon.Visible = false;
+            this.Show();
+            UserPerfs.IsHidden = false;
+            this.SetVisibleCore(true);
         }
 
         /// <summary>
@@ -75,10 +125,7 @@ namespace SPDIFKA
         {
             if (e.Button.Equals(MouseButtons.Left))
             {
-                this.WindowState = FormWindowState.Normal;
-                this.ShowInTaskbar = true;
-                notifyIcon.Visible = false;
-                this.Show();
+                this.restore();
             }
         }
 
@@ -126,6 +173,7 @@ namespace SPDIFKA
                 this.notifyIcon.BalloonTipText = name + " - " + startMessage;
                 startStopButton.Text = "stop";
                 AudioControl.Instance.start();
+                UserPerfs.IsRunning = true;
             }
             else
             {
@@ -135,8 +183,8 @@ namespace SPDIFKA
                 runningLabel.Text = stoppedMessage;
                 this.notifyIcon.BalloonTipText = name + " - " + stoppedMessage;
                 AudioControl.Instance.stop();
+                UserPerfs.IsRunning = false;
             }
         }
-
     }
 }
