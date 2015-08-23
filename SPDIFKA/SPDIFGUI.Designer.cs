@@ -67,7 +67,7 @@
             this.notifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("notifyIcon.Icon")));
             this.notifyIcon.Text = "notifyIcon";
             this.notifyIcon.Visible = true;
-            this.notifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon1_MouseDoubleClick);
+            this.notifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseClick);
             // 
             // runningLabel
             // 
@@ -87,36 +87,36 @@
             this.toolStripSeparator2,
             this.toolStripAbout});
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(153, 104);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(111, 82);
             // 
             // toolStripStart
             // 
             this.toolStripStart.Name = "toolStripStart";
-            this.toolStripStart.Size = new System.Drawing.Size(152, 22);
+            this.toolStripStart.Size = new System.Drawing.Size(110, 22);
             this.toolStripStart.Text = "[temp]";
             this.toolStripStart.Click += new System.EventHandler(this.toolStripStart_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
             // 
             // toolStripExit
             // 
             this.toolStripExit.Name = "toolStripExit";
-            this.toolStripExit.Size = new System.Drawing.Size(152, 22);
+            this.toolStripExit.Size = new System.Drawing.Size(110, 22);
             this.toolStripExit.Text = "Exit";
             this.toolStripExit.Click += new System.EventHandler(this.toolStripExit_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(107, 6);
             // 
             // toolStripAbout
             // 
             this.toolStripAbout.Name = "toolStripAbout";
-            this.toolStripAbout.Size = new System.Drawing.Size(152, 22);
+            this.toolStripAbout.Size = new System.Drawing.Size(110, 22);
             this.toolStripAbout.Text = "About";
             this.toolStripAbout.Click += new System.EventHandler(this.toolStripAbout_Click);
             // 

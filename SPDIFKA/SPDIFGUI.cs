@@ -63,19 +63,21 @@ namespace SPDIFKA
                 notifyIcon.Visible = true;
                 notifyIcon.ShowBalloonTip(2500);
                 this.ShowInTaskbar = false;
+                this.Hide();
             }
         }
 
         /// <summary>
-        /// Double mouse click event to manage the restoring of the tool window.
+        /// Single mouse click event to manage the restoring of the tool window.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void notifyIcon1_MouseDoubleClick(object sender, MouseEventArgs e)
+        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
             notifyIcon.Visible = false;
+            this.Show();
         }
 
         /// <summary>
@@ -133,5 +135,6 @@ namespace SPDIFKA
                 AudioControl.Instance.stop();
             }
         }
+
     }
 }
