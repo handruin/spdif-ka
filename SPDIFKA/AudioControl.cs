@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace SPDIFKA
 {
-    class AudioControl
+    class AudioControl : IDisposable
     {
         private Boolean isSoundStarted = false;
         private SoundPlayer sound;
@@ -32,6 +32,22 @@ namespace SPDIFKA
                 return instance;
             }
         }
+
+        ~AudioControl()
+        {
+            //Dispose(false);
+        }
+
+        //public void Dispose()
+        //{
+        //    Dispose(true);
+        //    GC.SuppressFinalize(this);
+        //}
+
+        //private void Dispose(bool p)
+        //{
+        //    this.sound.Dispose();
+        //}
 
         /// <summary>
         /// Start the audio playback which will keep the SPDIF link alive.
