@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using System.Windows.Forms;
 
 namespace SPDIFKA
@@ -7,7 +8,7 @@ namespace SPDIFKA
     {
         private static String name = "SPDIF-KA";
         private static String stoppedMessage = "stopped";
-        private static String startMessage = "running...";
+        private static String startMessage = "running";
         private static String toolStripStartText = "Start " + name;
         private static String toolStripStopText = "Stop " + name;
 
@@ -24,46 +25,39 @@ namespace SPDIFKA
         {
             InitializeComponent();
 
-            this.notifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.notifyIcon.BalloonTipText = name + " - " + stoppedMessage;
-            this.notifyIcon.BalloonTipTitle = name;
+            this.MaximizeBox = false;
+
+            this.spdifka.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
+            this.spdifka.BalloonTipTitle = name;
+            this.spdifka.Text = name + " - " + stoppedMessage;
             
             toolStripStart.Text = toolStripStartText;
-            this.notifyIcon.ContextMenuStrip = contextMenuStrip1;
+            this.spdifka.ContextMenuStrip = RightClickMenuStrip;
             this.Resize += new System.EventHandler(this.Form1_Resize);
             runningLabel.Text = stoppedMessage;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             this.loadState();
         }
 
-        private bool allowVisible;     // ContextMenu's Show command used
-        protected override void SetVisibleCore(bool value)
-        {
-            //if (!allowVisible)
-            //{
-            //    value = false;
-            //    if (!this.IsHandleCreated) CreateHandle();
-            //}
-            base.SetVisibleCore(value);
-        }
-
+        /// <summary>
+        /// Load the settings and state of the application that were previously saved.
+        /// </summary>
         private void loadState()
         {
-
+            //Update the visual check boxes with saved state.
+            IsMinimizedCheckBox.Checked = UserPerfs.IsHidden;
+            IsRunningCheckBox.Checked = UserPerfs.IsRunning;
+            
             if (UserPerfs.IsHidden)
             {
                 this.minimize();
             }
-            else
-            {
-                this.restore();
-            }
-
+            
             if (UserPerfs.IsRunning)
             {
                 manageStartStop();
             }
-
         }
 
         /// <summary>
@@ -97,23 +91,25 @@ namespace SPDIFKA
             }
         }
 
+        /// <summary>
+        /// Minimize the application into the task bar.
+        /// </summary>
         private void minimize()
         {
-            notifyIcon.Visible = true;
+            this.WindowState = FormWindowState.Minimized;
+            spdifka.Visible = true;
             this.ShowInTaskbar = false;
             this.Hide();
-            UserPerfs.IsHidden = true;
-            this.SetVisibleCore(false);
         }
 
+        /// <summary>
+        /// Restore the window to normal user operation mode.
+        /// </summary>
         private void restore()
         {
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
-            notifyIcon.Visible = false;
-            this.Show();
-            UserPerfs.IsHidden = false;
-            this.SetVisibleCore(true);
+            this.Show();           
         }
 
         /// <summary>
@@ -167,24 +163,62 @@ namespace SPDIFKA
         {
             if (!AudioControl.Instance.isRunning())
             {
-                this.notifyIcon.Text = name + " - " + startMessage;
+                this.spdifka.Text = name + " - " + startMessage;
                 toolStripStart.Text = toolStripStopText;
                 runningLabel.Text = startMessage;
-                this.notifyIcon.BalloonTipText = name + " - " + startMessage;
+                this.spdifka.BalloonTipText = name + " - " + startMessage;
                 startStopButton.Text = "stop";
                 AudioControl.Instance.start();
-                UserPerfs.IsRunning = true;
+                this.updateTrayIconWhenRunning(true);
             }
             else
             {
-                this.notifyIcon.Text = name + " - " + stoppedMessage;
+                this.spdifka.Text = name + " - " + stoppedMessage;
                 startStopButton.Text = "start";
                 toolStripStart.Text = toolStripStartText;
                 runningLabel.Text = stoppedMessage;
-                this.notifyIcon.BalloonTipText = name + " - " + stoppedMessage;
+                this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
                 AudioControl.Instance.stop();
-                UserPerfs.IsRunning = false;
+                this.updateTrayIconWhenRunning(false);
             }
+        }
+
+        /// <summary>
+        /// Update the visual icon in the tray to represent the application state.
+        /// </summary>
+        /// <param name="isRunning"></param>
+        private void updateTrayIconWhenRunning(Boolean isRunning)
+        {            
+            if (isRunning)
+            {
+                spdifka.Icon = Properties.Resources.bar_chart_64_green;
+            }
+            else
+            {
+                spdifka.Icon = Properties.Resources.bar_chart_64_white;
+            }
+        }
+
+        /// <summary>
+        /// Handle event when IsMinimized CheckBox is selected/deselected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IsMinimizedCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            UserPerfs.IsHidden = IsMinimizedCheckBox.Checked;
+            UserPerfs.Save();
+        }
+
+        /// <summary>
+        /// Handle event when IsRunning CheckBox is selected/deselected.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void IsRunningCheckBox_CheckedChanged(object sender, EventArgs e)
+        {
+            UserPerfs.IsRunning = IsRunningCheckBox.Checked;
+            UserPerfs.Save();
         }
     }
 }

@@ -48,7 +48,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>paper-arrow-green-24.ico</ApplicationIcon>
+    <ApplicationIcon>bar-chart-64-white.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
@@ -125,8 +125,11 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="bar-chart-64-white.ico" />
+    <None Include="bar-chart-64-white2.ico" />
+    <None Include="bar-chart-64-red.ico" />
     <None Include="media\silence.wav" />
-    <Content Include="paper-arrow-green-24.ico" />
+    <Content Include="bar-chart-64-green.ico" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5">

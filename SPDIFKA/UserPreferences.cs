@@ -17,10 +17,10 @@ namespace SPDIFKA
             Load();
         }
 
-        ~UserPreferences()
-        {
-            Save();
-        }
+        //~UserPreferences()
+        //{
+        //    Save();
+        //}
 
         public void Save()
         {

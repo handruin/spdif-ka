@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 namespace SPDIFKA
 {
-    class AudioControl : IDisposable
+    class AudioControl
     {
         private Boolean isSoundStarted = false;
         private SoundPlayer sound;
