@@ -14,6 +14,3 @@ This utility plays a mono-channel WAV file which contains no sound.  This tricks
 
 ### Ways to help
 - **Fix bugs, add features.** Fix an **[open issue](https://github.com/handruin/spdif-ka/issues?state=open)** on this repo. This spdif-ka utility is an Open Source Project.  Please contribute by recommend enhancements, writing code, testing, fixing bugs, etc.
-- **Optional Donations.** If you would like to support with a donation: 
-  - Bitcoin address:  *12c9ox5o9NekSf1AYD6x6tzAYCvvNgCUGp*
-  - Dogecoin address: *DGckZfy5Qh3tTYw1E44NCCanZKQ6gMVtiK*
