@@ -17,11 +17,6 @@ namespace SPDIFKA
             Load();
         }
 
-        //~UserPreferences()
-        //{
-        //    Save();
-        //}
-
         public void Save()
         {
             Properties.Settings.Default.IsHidden = this.IsHidden;
