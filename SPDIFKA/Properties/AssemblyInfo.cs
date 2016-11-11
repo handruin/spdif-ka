@@ -8,7 +8,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("SPDIF-KA")]
 [assembly: AssemblyDescription("SPDIF Keep Alive utility")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
+[assembly: AssemblyCompany("handruin.com")]
 [assembly: AssemblyProduct("SPDIF-KA")]
 [assembly: AssemblyCopyright("Copyright handruin.com ©  2016")]
 [assembly: AssemblyTrademark("")]
