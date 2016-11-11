@@ -51,10 +51,10 @@
     <ApplicationIcon>bar-chart-64-white.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <SignAssembly>true</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
     <ManifestCertificateThumbprint>7046D9568D59A523617F9A0EC71F678DB1DC4ED4</ManifestCertificateThumbprint>
@@ -70,6 +70,12 @@
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>SPDIFKA.SPDIFKA</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>spdifka-sn-key.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
@@ -119,7 +125,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
-    <None Include="SPDIFKA_TemporaryKey.pfx" />
+    <None Include="spdifka-sn-key.pfx" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

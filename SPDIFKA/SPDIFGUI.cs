@@ -11,6 +11,7 @@ namespace SPDIFKA
         private static String startMessage = "running";
         private static String toolStripStartText = "Start " + name;
         private static String toolStripStopText = "Stop " + name;
+        private bool isAppVisible = true;
 
         private static String version = System.Reflection.Assembly.GetExecutingAssembly()
                                            .GetName()
@@ -38,6 +39,21 @@ namespace SPDIFKA
             runningLabel.Text = stoppedMessage;
             FormBorderStyle = FormBorderStyle.FixedSingle;
             this.loadState();
+        }
+
+        /// <summary>
+        /// Overriding this method to solve an issue related to starting this application in a minimized state.
+        /// This now allows the utility to start minimized and hides this utility from the alt + tab menu.
+        /// </summary>
+        /// <param name="isVisible"></param>
+        protected override void SetVisibleCore(bool isVisible)
+        {
+            if (!isAppVisible)
+            {
+                isVisible = false;
+                if (!this.IsHandleCreated) CreateHandle();
+            }
+            base.SetVisibleCore(isVisible);
         }
 
         /// <summary>
@@ -96,9 +112,9 @@ namespace SPDIFKA
         /// </summary>
         private void minimize()
         {
-            this.WindowState = FormWindowState.Minimized;
+            this.isAppVisible = false;
             spdifka.Visible = true;
-            this.ShowInTaskbar = false;
+            this.ShowInTaskbar = false;            
             this.Hide();
         }
 
@@ -107,6 +123,7 @@ namespace SPDIFKA
         /// </summary>
         private void restore()
         {
+            this.isAppVisible = true;
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
             this.Show();           
@@ -153,7 +170,7 @@ namespace SPDIFKA
         /// <param name="e"></param>
         private void toolStripAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Copyright 2015 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Copyright 2016 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
