@@ -64,7 +64,18 @@ namespace SPDIFKA
             //Update the visual check boxes with saved state.
             IsMinimizedCheckBox.Checked = UserPerfs.IsHidden;
             IsRunningCheckBox.Checked = UserPerfs.IsRunning;
-            
+            if (UserPerfs.SoundType == UserPreferences.Sound.Silent)
+            {
+                silent_sound.Checked = true;
+                inaudible_sound.Checked = false;
+            }
+
+            if (UserPerfs.SoundType == UserPreferences.Sound.Inaudible)
+            {
+                silent_sound.Checked = false;
+                inaudible_sound.Checked = true;
+            }
+
             if (UserPerfs.IsHidden)
             {
                 this.minimize();
@@ -201,6 +212,18 @@ namespace SPDIFKA
         }
 
         /// <summary>
+        /// Restart the audio control only if the audio was already running.
+        /// </summary>
+        private void restartAudioControl()
+        {
+            if (AudioControl.Instance.isRunning())
+            {
+                AudioControl.Instance.stop();
+                AudioControl.Instance.start();
+            }
+        }
+
+        /// <summary>
         /// Update the visual icon in the tray to represent the application state.
         /// </summary>
         /// <param name="isRunning"></param>
@@ -236,6 +259,36 @@ namespace SPDIFKA
         {
             UserPerfs.IsRunning = IsRunningCheckBox.Checked;
             UserPerfs.Save();
+        }
+
+        /// <summary>
+        /// Handle event when inaudible sound radio button is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void inaudible_sound_CheckedChanged(object sender, EventArgs e)
+        {
+            if (inaudible_sound.Checked)
+            {
+                UserPerfs.SoundType = UserPreferences.Sound.Inaudible;
+                UserPerfs.Save();
+                restartAudioControl();
+            }
+        }
+
+        /// <summary>
+        /// Handle event when silent sound radio button is changed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void silent_sound_CheckedChanged(object sender, EventArgs e)
+        {
+            if (silent_sound.Checked)
+            {
+                UserPerfs.SoundType = UserPreferences.Sound.Silent;
+                UserPerfs.Save();
+                restartAudioControl();
+            }
         }
     }
 }

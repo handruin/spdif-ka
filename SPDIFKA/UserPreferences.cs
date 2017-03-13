@@ -8,9 +8,10 @@ namespace SPDIFKA
 {
     class UserPreferences
     {
-
+        public enum Sound { Silent, Inaudible}
         public Boolean IsRunning { get; set; }
         public Boolean IsHidden { get; set; }
+        public Sound SoundType { get; set; }
 
         public UserPreferences()
         {
@@ -21,6 +22,7 @@ namespace SPDIFKA
         {
             Properties.Settings.Default.IsHidden = this.IsHidden;
             Properties.Settings.Default.IsRunning = this.IsRunning;
+            Properties.Settings.Default.SoundType = this.SoundType.ToString();
             Properties.Settings.Default.Save();
         }
 
@@ -28,7 +30,15 @@ namespace SPDIFKA
 
             this.IsHidden = Properties.Settings.Default.IsHidden;
             this.IsRunning = Properties.Settings.Default.IsRunning;
+            if (Properties.Settings.Default.SoundType == "Silent")
+            {
+                this.SoundType = Sound.Silent;
+            }
 
+            if (Properties.Settings.Default.SoundType == "Inaudible")
+            {
+                this.SoundType = Sound.Inaudible;
+            }
         }
 
     }

@@ -83,9 +83,18 @@ namespace SPDIFKA.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
         /// </summary>
-        internal static System.IO.UnmanagedMemoryStream silence {
+        internal static System.IO.UnmanagedMemoryStream blank {
             get {
-                return ResourceManager.GetStream("silence", resourceCulture);
+                return ResourceManager.GetStream("blank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream inaudible {
+            get {
+                return ResourceManager.GetStream("inaudible", resourceCulture);
             }
         }
     }

@@ -8,5 +8,8 @@
     <Setting Name="IsRunning" Type="System.Boolean" Scope="User">
       <Value Profile="(Default)">False</Value>
     </Setting>
+    <Setting Name="SoundType" Type="System.String" Scope="User">
+      <Value Profile="(Default)">Inaudible</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

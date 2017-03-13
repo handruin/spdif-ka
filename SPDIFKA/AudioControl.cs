@@ -15,6 +15,8 @@ namespace SPDIFKA
         private Boolean isSoundStarted = false;
         private SoundPlayer sound;
         private static AudioControl instance;
+        private static UserPreferences UserPerfs = new UserPreferences();
+        private UnmanagedMemoryStream sound_type;
 
         private AudioControl() { }
 
@@ -54,7 +56,21 @@ namespace SPDIFKA
         /// </summary>
         public void start()
         {
-            sound = new SoundPlayer(Properties.Resources.silence);
+            UserPerfs.Load(); //Reload preferences to make sure the latest sound type is applied.
+            if (UserPerfs.SoundType == UserPreferences.Sound.Inaudible)
+            {
+                sound_type = Properties.Resources.inaudible;
+            }
+            else if (UserPerfs.SoundType == UserPreferences.Sound.Silent)
+            {
+                sound_type = Properties.Resources.blank;
+            }
+            else
+            {
+                sound_type = Properties.Resources.inaudible;
+            }
+
+            sound = new SoundPlayer(sound_type);
             sound.LoadCompleted += new AsyncCompletedEventHandler(wavPlayer_LoadCompleted);
             sound.LoadAsync();
         }
