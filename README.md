@@ -14,3 +14,16 @@ This utility plays a mono-channel WAV file which contains no sound.  This tricks
 
 ### Ways to help
 - **Fix bugs, add features.** Fix an **[open issue](https://github.com/handruin/spdif-ka/issues?state=open)** on this repo. This spdif-ka utility is an Open Source Project.  Please contribute by recommend enhancements, writing code, testing, fixing bugs, etc.
+
+### Features overview
+- Runs in the windows system tray and displays a green icon when the keep-alive is running.
+- Support for saving configuration settings so that when you exit the utility the same settings will be applied when spdif-ka is restarted.
+- New support for audio selection type.  The inaudible audio option is the default option to be used when needing to keep an audio channel open.  The silent audio option can be used in special cases and is currently experimental for some use-cases.
+
+### GUI Screen captures
+- Main screen of the utility
+
+![ScreenShot](/screen-captures/spdif-ka_sc1.jpg)
+- Settings tab
+
+![ScreenShot](/screen-captures/spdif-ka_sc2.jpg)
