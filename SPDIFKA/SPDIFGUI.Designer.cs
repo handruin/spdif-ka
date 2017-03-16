@@ -43,6 +43,8 @@
             this.TabsMenu1 = new System.Windows.Forms.TabControl();
             this.MainPage = new System.Windows.Forms.TabPage();
             this.TabSettings = new System.Windows.Forms.TabPage();
+            this.IsMinimizeOnCloseCheckbox = new System.Windows.Forms.CheckBox();
+            this.IsMinimizeToNotificationCheckbox = new System.Windows.Forms.CheckBox();
             this.IsRunningCheckBox = new System.Windows.Forms.CheckBox();
             this.IsMinimizedCheckBox = new System.Windows.Forms.CheckBox();
             this.AudioOptions = new System.Windows.Forms.TabPage();
@@ -166,6 +168,8 @@
             // 
             // TabSettings
             // 
+            this.TabSettings.Controls.Add(this.IsMinimizeOnCloseCheckbox);
+            this.TabSettings.Controls.Add(this.IsMinimizeToNotificationCheckbox);
             this.TabSettings.Controls.Add(this.IsRunningCheckBox);
             this.TabSettings.Controls.Add(this.IsMinimizedCheckBox);
             this.TabSettings.Location = new System.Drawing.Point(4, 29);
@@ -176,6 +180,28 @@
             this.TabSettings.TabIndex = 1;
             this.TabSettings.Text = "Settings";
             this.TabSettings.UseVisualStyleBackColor = true;
+            // 
+            // IsMinimizeOnCloseCheckbox
+            // 
+            this.IsMinimizeOnCloseCheckbox.AutoSize = true;
+            this.IsMinimizeOnCloseCheckbox.Location = new System.Drawing.Point(160, 54);
+            this.IsMinimizeOnCloseCheckbox.Name = "IsMinimizeOnCloseCheckbox";
+            this.IsMinimizeOnCloseCheckbox.Size = new System.Drawing.Size(152, 24);
+            this.IsMinimizeOnCloseCheckbox.TabIndex = 3;
+            this.IsMinimizeOnCloseCheckbox.Text = "Minimize on close";
+            this.IsMinimizeOnCloseCheckbox.UseVisualStyleBackColor = true;
+            this.IsMinimizeOnCloseCheckbox.CheckedChanged += new System.EventHandler(this.MinimizToNotificationOnClose_CheckedChanged);
+            // 
+            // IsMinimizeToNotificationCheckbox
+            // 
+            this.IsMinimizeToNotificationCheckbox.AutoSize = true;
+            this.IsMinimizeToNotificationCheckbox.Location = new System.Drawing.Point(160, 19);
+            this.IsMinimizeToNotificationCheckbox.Name = "IsMinimizeToNotificationCheckbox";
+            this.IsMinimizeToNotificationCheckbox.Size = new System.Drawing.Size(224, 24);
+            this.IsMinimizeToNotificationCheckbox.TabIndex = 2;
+            this.IsMinimizeToNotificationCheckbox.Text = "Minimize to notification area";
+            this.IsMinimizeToNotificationCheckbox.UseVisualStyleBackColor = true;
+            this.IsMinimizeToNotificationCheckbox.CheckedChanged += new System.EventHandler(this.minimizeToNotification_CheckedChanged);
             // 
             // IsRunningCheckBox
             // 
@@ -263,6 +289,7 @@
             this.Name = "SPDIFKAGUI";
             this.ShowIcon = false;
             this.Text = "SPDIF-KA";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.SPDIFKAGUI_FormClosing);
             this.RightClickMenuStrip.ResumeLayout(false);
             this.TabsMenu1.ResumeLayout(false);
             this.MainPage.ResumeLayout(false);
@@ -297,6 +324,8 @@
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.RadioButton inaudible_sound;
         private System.Windows.Forms.RadioButton silent_sound;
+        private System.Windows.Forms.CheckBox IsMinimizeOnCloseCheckbox;
+        private System.Windows.Forms.CheckBox IsMinimizeToNotificationCheckbox;
     }
 }
 

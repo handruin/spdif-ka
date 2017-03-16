@@ -58,5 +58,29 @@ namespace SPDIFKA.Properties {
                 this["SoundType"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool IsMinimizedNotification {
+            get {
+                return ((bool)(this["IsMinimizedNotification"]));
+            }
+            set {
+                this["IsMinimizedNotification"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool IsMinimizedOnClose {
+            get {
+                return ((bool)(this["IsMinimizedOnClose"]));
+            }
+            set {
+                this["IsMinimizedOnClose"] = value;
+            }
+        }
     }
 }

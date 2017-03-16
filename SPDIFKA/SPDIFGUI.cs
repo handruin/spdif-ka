@@ -17,7 +17,7 @@ namespace SPDIFKA
                                            .GetName()
                                            .Version
                                            .ToString();
-        private static UserPreferences UserPerfs = new UserPreferences();
+        private static UserPreferences UserPrefs = new UserPreferences();
 
         /// <summary>
         /// General initialization.
@@ -63,26 +63,28 @@ namespace SPDIFKA
         private void loadState()
         {
             //Update the visual check boxes with saved state.
-            IsMinimizedCheckBox.Checked = UserPerfs.IsHidden;
-            IsRunningCheckBox.Checked = UserPerfs.IsRunning;
-            if (UserPerfs.SoundType == UserPreferences.Sound.Silent)
+            IsMinimizedCheckBox.Checked = UserPrefs.IsHidden;
+            IsRunningCheckBox.Checked = UserPrefs.IsRunning;
+            IsMinimizeToNotificationCheckbox.Checked = UserPrefs.IsMinimizeToNotificationArea;
+            IsMinimizeOnCloseCheckbox.Checked = UserPrefs.IsMinimizedOnClose;
+            if (UserPrefs.SoundType == UserPreferences.Sound.Silent)
             {
                 silent_sound.Checked = true;
                 inaudible_sound.Checked = false;
             }
 
-            if (UserPerfs.SoundType == UserPreferences.Sound.Inaudible)
+            if (UserPrefs.SoundType == UserPreferences.Sound.Inaudible)
             {
                 silent_sound.Checked = false;
                 inaudible_sound.Checked = true;
             }
 
-            if (UserPerfs.IsHidden)
+            if (UserPrefs.IsHidden)
             {
                 this.minimize();
             }
             
-            if (UserPerfs.IsRunning)
+            if (UserPrefs.IsRunning)
             {
                 manageStartStop();
             }
@@ -124,10 +126,26 @@ namespace SPDIFKA
         /// </summary>
         private void minimize()
         {
-            this.isAppVisible = false;
+            
             spdifka.Visible = true;
-            this.ShowInTaskbar = false;
-            this.Hide();
+            this.minimized_to_notificaton_area();
+            
+        }
+
+        private void minimized_to_notificaton_area()
+        {
+            if (UserPrefs.IsMinimizeToNotificationArea)
+            {
+                this.isAppVisible = false;
+                this.ShowInTaskbar = false;
+                this.Hide();
+            }
+            else
+            {
+                this.isAppVisible = true;
+                this.WindowState = FormWindowState.Minimized;
+                this.ShowInTaskbar = true;
+            }
         }
 
         /// <summary>
@@ -172,7 +190,29 @@ namespace SPDIFKA
         /// <param name="e"></param>
         private void toolStripExit_Click(object sender, EventArgs e)
         {
+            this.exit_application();
+        }
+
+        private void SPDIFKAGUI_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                if (UserPrefs.IsMinimizedOnClose)
+                {
+                    this.minimize();
+                    e.Cancel = true;
+                }
+                else
+                {
+                    this.exit_application();
+                }
+            }
+        }
+
+        private void exit_application()
+        {
             AudioControl.Instance.stop();  //Ensure audio stops before exiting.
+            spdifka.Icon = null;  //Ensure tray icon does not persist after close.
             Application.Exit();
         }
 
@@ -250,8 +290,8 @@ namespace SPDIFKA
         /// <param name="e"></param>
         private void IsMinimizedCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            UserPerfs.IsHidden = IsMinimizedCheckBox.Checked;
-            UserPerfs.Save();
+            UserPrefs.IsHidden = IsMinimizedCheckBox.Checked;
+            UserPrefs.Save();
         }
 
         /// <summary>
@@ -261,8 +301,20 @@ namespace SPDIFKA
         /// <param name="e"></param>
         private void IsRunningCheckBox_CheckedChanged(object sender, EventArgs e)
         {
-            UserPerfs.IsRunning = IsRunningCheckBox.Checked;
-            UserPerfs.Save();
+            UserPrefs.IsRunning = IsRunningCheckBox.Checked;
+            UserPrefs.Save();
+        }
+
+        private void minimizeToNotification_CheckedChanged(object sender, EventArgs e)
+        {
+            UserPrefs.IsMinimizeToNotificationArea = IsMinimizeToNotificationCheckbox.Checked;
+            UserPrefs.Save();
+        }
+
+        private void MinimizToNotificationOnClose_CheckedChanged(object sender, EventArgs e)
+        {
+            UserPrefs.IsMinimizedOnClose = IsMinimizeOnCloseCheckbox.Checked;
+            UserPrefs.Save();
         }
 
         /// <summary>
@@ -274,8 +326,8 @@ namespace SPDIFKA
         {
             if (inaudible_sound.Checked)
             {
-                UserPerfs.SoundType = UserPreferences.Sound.Inaudible;
-                UserPerfs.Save();
+                UserPrefs.SoundType = UserPreferences.Sound.Inaudible;
+                UserPrefs.Save();
                 restartAudioControl();
             }
         }
@@ -289,8 +341,8 @@ namespace SPDIFKA
         {
             if (silent_sound.Checked)
             {
-                UserPerfs.SoundType = UserPreferences.Sound.Silent;
-                UserPerfs.Save();
+                UserPrefs.SoundType = UserPreferences.Sound.Silent;
+                UserPrefs.Save();
                 restartAudioControl();
             }
         }
