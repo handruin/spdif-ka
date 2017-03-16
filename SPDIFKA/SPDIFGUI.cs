@@ -126,7 +126,7 @@ namespace SPDIFKA
         {
             this.isAppVisible = false;
             spdifka.Visible = true;
-            this.ShowInTaskbar = false;            
+            this.ShowInTaskbar = false;
             this.Hide();
         }
 
@@ -138,7 +138,8 @@ namespace SPDIFKA
             this.isAppVisible = true;
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
-            this.Show();           
+            this.Show();
+            this.Activate();
         }
 
         /// <summary>
@@ -229,7 +230,7 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="isRunning"></param>
         private void updateTrayIconWhenRunning(Boolean isRunning)
-        {            
+        {
             if (isRunning)
             {
                 spdifka.Icon = Properties.Resources.bar_chart_64_green;
