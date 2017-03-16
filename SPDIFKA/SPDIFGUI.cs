@@ -237,14 +237,14 @@ namespace SPDIFKA
                 toolStripStart.Text = toolStripStopText;
                 runningLabel.Text = startMessage;
                 this.spdifka.BalloonTipText = name + " - " + startMessage;
-                startStopButton.Text = "stop";
+                startStopButton.Text = "Stop";
                 AudioControl.Instance.start();
                 this.updateTrayIconWhenRunning(true);
             }
             else
             {
                 this.spdifka.Text = name + " - " + stoppedMessage;
-                startStopButton.Text = "start";
+                startStopButton.Text = "Start";
                 toolStripStart.Text = toolStripStartText;
                 runningLabel.Text = stoppedMessage;
                 this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
