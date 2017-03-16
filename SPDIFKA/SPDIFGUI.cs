@@ -33,7 +33,8 @@ namespace SPDIFKA
             this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
             this.spdifka.BalloonTipTitle = name;
             this.spdifka.Text = name + " - " + stoppedMessage;
-            
+            this.spdifka.Icon = Properties.Resources.bar_chart_64_red;
+
             toolStripStart.Text = toolStripStartText;
             this.spdifka.ContextMenuStrip = RightClickMenuStrip;
             this.Resize += new System.EventHandler(this.Form1_Resize);
