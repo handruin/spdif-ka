@@ -43,21 +43,23 @@
             this.TabsMenu1 = new System.Windows.Forms.TabControl();
             this.MainPage = new System.Windows.Forms.TabPage();
             this.TabSettings = new System.Windows.Forms.TabPage();
+            this.IsRunningCheckBox = new System.Windows.Forms.CheckBox();
+            this.IsMinimizedCheckBox = new System.Windows.Forms.CheckBox();
+            this.AudioOptions = new System.Windows.Forms.TabPage();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.inaudible_sound = new System.Windows.Forms.RadioButton();
             this.silent_sound = new System.Windows.Forms.RadioButton();
-            this.IsRunningCheckBox = new System.Windows.Forms.CheckBox();
-            this.IsMinimizedCheckBox = new System.Windows.Forms.CheckBox();
             this.RightClickMenuStrip.SuspendLayout();
             this.TabsMenu1.SuspendLayout();
             this.MainPage.SuspendLayout();
             this.TabSettings.SuspendLayout();
+            this.AudioOptions.SuspendLayout();
             this.groupBox1.SuspendLayout();
             this.SuspendLayout();
             // 
             // startStopButton
             // 
-            this.startStopButton.Location = new System.Drawing.Point(12, 23);
+            this.startStopButton.Location = new System.Drawing.Point(12, 34);
             this.startStopButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.startStopButton.Name = "startStopButton";
             this.startStopButton.Size = new System.Drawing.Size(80, 35);
@@ -69,7 +71,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(94, 31);
+            this.label1.Location = new System.Drawing.Point(94, 42);
             this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(139, 20);
@@ -86,7 +88,7 @@
             // runningLabel
             // 
             this.runningLabel.AutoSize = true;
-            this.runningLabel.Location = new System.Drawing.Point(234, 31);
+            this.runningLabel.Location = new System.Drawing.Point(234, 42);
             this.runningLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
             this.runningLabel.Name = "runningLabel";
             this.runningLabel.Size = new System.Drawing.Size(67, 20);
@@ -140,6 +142,7 @@
             // 
             this.TabsMenu1.Controls.Add(this.MainPage);
             this.TabsMenu1.Controls.Add(this.TabSettings);
+            this.TabsMenu1.Controls.Add(this.AudioOptions);
             this.TabsMenu1.Location = new System.Drawing.Point(4, 3);
             this.TabsMenu1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.TabsMenu1.Name = "TabsMenu1";
@@ -163,7 +166,6 @@
             // 
             // TabSettings
             // 
-            this.TabSettings.Controls.Add(this.groupBox1);
             this.TabSettings.Controls.Add(this.IsRunningCheckBox);
             this.TabSettings.Controls.Add(this.IsMinimizedCheckBox);
             this.TabSettings.Location = new System.Drawing.Point(4, 29);
@@ -175,16 +177,52 @@
             this.TabSettings.Text = "Settings";
             this.TabSettings.UseVisualStyleBackColor = true;
             // 
+            // IsRunningCheckBox
+            // 
+            this.IsRunningCheckBox.AutoSize = true;
+            this.IsRunningCheckBox.Location = new System.Drawing.Point(9, 55);
+            this.IsRunningCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.IsRunningCheckBox.Name = "IsRunningCheckBox";
+            this.IsRunningCheckBox.Size = new System.Drawing.Size(127, 24);
+            this.IsRunningCheckBox.TabIndex = 1;
+            this.IsRunningCheckBox.Text = "Start Running";
+            this.IsRunningCheckBox.UseVisualStyleBackColor = true;
+            this.IsRunningCheckBox.CheckedChanged += new System.EventHandler(this.IsRunningCheckBox_CheckedChanged);
+            // 
+            // IsMinimizedCheckBox
+            // 
+            this.IsMinimizedCheckBox.AutoSize = true;
+            this.IsMinimizedCheckBox.Location = new System.Drawing.Point(9, 20);
+            this.IsMinimizedCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.IsMinimizedCheckBox.Name = "IsMinimizedCheckBox";
+            this.IsMinimizedCheckBox.Size = new System.Drawing.Size(137, 24);
+            this.IsMinimizedCheckBox.TabIndex = 0;
+            this.IsMinimizedCheckBox.Text = "Start Minimized";
+            this.IsMinimizedCheckBox.UseVisualStyleBackColor = true;
+            this.IsMinimizedCheckBox.CheckedChanged += new System.EventHandler(this.IsMinimizedCheckBox_CheckedChanged);
+            // 
+            // AudioOptions
+            // 
+            this.AudioOptions.Controls.Add(this.groupBox1);
+            this.AudioOptions.Location = new System.Drawing.Point(4, 29);
+            this.AudioOptions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.AudioOptions.Name = "AudioOptions";
+            this.AudioOptions.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.AudioOptions.Size = new System.Drawing.Size(428, 107);
+            this.AudioOptions.TabIndex = 2;
+            this.AudioOptions.Text = "Audio Options";
+            this.AudioOptions.UseVisualStyleBackColor = true;
+            // 
             // groupBox1
             // 
             this.groupBox1.Controls.Add(this.inaudible_sound);
             this.groupBox1.Controls.Add(this.silent_sound);
-            this.groupBox1.Location = new System.Drawing.Point(188, 0);
+            this.groupBox1.Location = new System.Drawing.Point(8, 6);
             this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(232, 94);
-            this.groupBox1.TabIndex = 4;
+            this.groupBox1.Size = new System.Drawing.Size(412, 94);
+            this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Audio Type";
             // 
@@ -214,30 +252,6 @@
             this.silent_sound.UseVisualStyleBackColor = true;
             this.silent_sound.CheckedChanged += new System.EventHandler(this.silent_sound_CheckedChanged);
             // 
-            // IsRunningCheckBox
-            // 
-            this.IsRunningCheckBox.AutoSize = true;
-            this.IsRunningCheckBox.Location = new System.Drawing.Point(9, 55);
-            this.IsRunningCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.IsRunningCheckBox.Name = "IsRunningCheckBox";
-            this.IsRunningCheckBox.Size = new System.Drawing.Size(127, 24);
-            this.IsRunningCheckBox.TabIndex = 1;
-            this.IsRunningCheckBox.Text = "Start Running";
-            this.IsRunningCheckBox.UseVisualStyleBackColor = true;
-            this.IsRunningCheckBox.CheckedChanged += new System.EventHandler(this.IsRunningCheckBox_CheckedChanged);
-            // 
-            // IsMinimizedCheckBox
-            // 
-            this.IsMinimizedCheckBox.AutoSize = true;
-            this.IsMinimizedCheckBox.Location = new System.Drawing.Point(9, 20);
-            this.IsMinimizedCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.IsMinimizedCheckBox.Name = "IsMinimizedCheckBox";
-            this.IsMinimizedCheckBox.Size = new System.Drawing.Size(137, 24);
-            this.IsMinimizedCheckBox.TabIndex = 0;
-            this.IsMinimizedCheckBox.Text = "Start Minimized";
-            this.IsMinimizedCheckBox.UseVisualStyleBackColor = true;
-            this.IsMinimizedCheckBox.CheckedChanged += new System.EventHandler(this.IsMinimizedCheckBox_CheckedChanged);
-            // 
             // SPDIFKAGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
@@ -255,6 +269,7 @@
             this.MainPage.PerformLayout();
             this.TabSettings.ResumeLayout(false);
             this.TabSettings.PerformLayout();
+            this.AudioOptions.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
             this.ResumeLayout(false);
@@ -278,9 +293,10 @@
         private System.Windows.Forms.TabPage TabSettings;
         private System.Windows.Forms.CheckBox IsRunningCheckBox;
         private System.Windows.Forms.CheckBox IsMinimizedCheckBox;
-        private System.Windows.Forms.RadioButton silent_sound;
-        private System.Windows.Forms.RadioButton inaudible_sound;
+        private System.Windows.Forms.TabPage AudioOptions;
         private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.RadioButton inaudible_sound;
+        private System.Windows.Forms.RadioButton silent_sound;
     }
 }
 
