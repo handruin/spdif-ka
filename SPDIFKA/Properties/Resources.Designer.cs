@@ -73,9 +73,9 @@ namespace SPDIFKA.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
-        internal static System.Drawing.Icon bar_chart_64_white {
+        internal static System.Drawing.Icon bar_chart_64_red {
             get {
-                object obj = ResourceManager.GetObject("bar_chart_64_white", resourceCulture);
+                object obj = ResourceManager.GetObject("bar_chart_64_red", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
             }
         }

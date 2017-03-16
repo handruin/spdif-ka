@@ -25,7 +25,8 @@ namespace SPDIFKA
         public SPDIFKAGUI()
         {
             InitializeComponent();
-
+            this.ShowIcon = true;
+            this.Icon = Properties.Resources.bar_chart_64_red;
             this.MaximizeBox = false;
 
             this.spdifka.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
@@ -181,7 +182,7 @@ namespace SPDIFKA
         /// <param name="e"></param>
         private void toolStripAbout_Click(object sender, EventArgs e)
         {
-            MessageBox.Show("Copyright 2016 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Copyright 2017 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -232,10 +233,12 @@ namespace SPDIFKA
             if (isRunning)
             {
                 spdifka.Icon = Properties.Resources.bar_chart_64_green;
+                this.Icon = Properties.Resources.bar_chart_64_green;
             }
             else
             {
-                spdifka.Icon = Properties.Resources.bar_chart_64_white;
+                spdifka.Icon = Properties.Resources.bar_chart_64_red;
+                this.Icon = Properties.Resources.bar_chart_64_red;
             }
         }
 
