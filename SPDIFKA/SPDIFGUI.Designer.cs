@@ -61,10 +61,9 @@
             // 
             // startStopButton
             // 
-            this.startStopButton.Location = new System.Drawing.Point(12, 34);
-            this.startStopButton.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.startStopButton.Location = new System.Drawing.Point(8, 22);
             this.startStopButton.Name = "startStopButton";
-            this.startStopButton.Size = new System.Drawing.Size(80, 35);
+            this.startStopButton.Size = new System.Drawing.Size(53, 23);
             this.startStopButton.TabIndex = 0;
             this.startStopButton.Text = "Start";
             this.startStopButton.UseVisualStyleBackColor = true;
@@ -73,16 +72,14 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(94, 42);
-            this.label1.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.label1.Location = new System.Drawing.Point(63, 27);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(139, 20);
+            this.label1.Size = new System.Drawing.Size(95, 13);
             this.label1.TabIndex = 1;
             this.label1.Text = "SPDIF Keep Alive:";
             // 
             // spdifka
             // 
-            this.spdifka.Icon = ((System.Drawing.Icon)(resources.GetObject("spdifka.Icon")));
             this.spdifka.Text = "SPDIF-KA";
             this.spdifka.Visible = true;
             this.spdifka.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseClick);
@@ -90,10 +87,9 @@
             // runningLabel
             // 
             this.runningLabel.AutoSize = true;
-            this.runningLabel.Location = new System.Drawing.Point(234, 42);
-            this.runningLabel.Margin = new System.Windows.Forms.Padding(4, 0, 4, 0);
+            this.runningLabel.Location = new System.Drawing.Point(156, 27);
             this.runningLabel.Name = "runningLabel";
-            this.runningLabel.Size = new System.Drawing.Size(67, 20);
+            this.runningLabel.Size = new System.Drawing.Size(45, 13);
             this.runningLabel.TabIndex = 2;
             this.runningLabel.Text = "stopped";
             // 
@@ -145,11 +141,10 @@
             this.TabsMenu1.Controls.Add(this.MainPage);
             this.TabsMenu1.Controls.Add(this.TabSettings);
             this.TabsMenu1.Controls.Add(this.AudioOptions);
-            this.TabsMenu1.Location = new System.Drawing.Point(4, 3);
-            this.TabsMenu1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.TabsMenu1.Location = new System.Drawing.Point(3, 2);
             this.TabsMenu1.Name = "TabsMenu1";
             this.TabsMenu1.SelectedIndex = 0;
-            this.TabsMenu1.Size = new System.Drawing.Size(436, 140);
+            this.TabsMenu1.Size = new System.Drawing.Size(291, 91);
             this.TabsMenu1.TabIndex = 3;
             // 
             // MainPage
@@ -157,11 +152,10 @@
             this.MainPage.Controls.Add(this.startStopButton);
             this.MainPage.Controls.Add(this.label1);
             this.MainPage.Controls.Add(this.runningLabel);
-            this.MainPage.Location = new System.Drawing.Point(4, 29);
-            this.MainPage.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.MainPage.Location = new System.Drawing.Point(4, 22);
             this.MainPage.Name = "MainPage";
-            this.MainPage.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.MainPage.Size = new System.Drawing.Size(428, 107);
+            this.MainPage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.MainPage.Size = new System.Drawing.Size(283, 65);
             this.MainPage.TabIndex = 0;
             this.MainPage.Text = "Main";
             this.MainPage.UseVisualStyleBackColor = true;
@@ -172,11 +166,10 @@
             this.TabSettings.Controls.Add(this.IsMinimizeToNotificationCheckbox);
             this.TabSettings.Controls.Add(this.IsRunningCheckBox);
             this.TabSettings.Controls.Add(this.IsMinimizedCheckBox);
-            this.TabSettings.Location = new System.Drawing.Point(4, 29);
-            this.TabSettings.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.TabSettings.Location = new System.Drawing.Point(4, 22);
             this.TabSettings.Name = "TabSettings";
-            this.TabSettings.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.TabSettings.Size = new System.Drawing.Size(428, 107);
+            this.TabSettings.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.TabSettings.Size = new System.Drawing.Size(283, 65);
             this.TabSettings.TabIndex = 1;
             this.TabSettings.Text = "Settings";
             this.TabSettings.UseVisualStyleBackColor = true;
@@ -184,9 +177,10 @@
             // IsMinimizeOnCloseCheckbox
             // 
             this.IsMinimizeOnCloseCheckbox.AutoSize = true;
-            this.IsMinimizeOnCloseCheckbox.Location = new System.Drawing.Point(160, 54);
+            this.IsMinimizeOnCloseCheckbox.Location = new System.Drawing.Point(107, 35);
+            this.IsMinimizeOnCloseCheckbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.IsMinimizeOnCloseCheckbox.Name = "IsMinimizeOnCloseCheckbox";
-            this.IsMinimizeOnCloseCheckbox.Size = new System.Drawing.Size(152, 24);
+            this.IsMinimizeOnCloseCheckbox.Size = new System.Drawing.Size(109, 17);
             this.IsMinimizeOnCloseCheckbox.TabIndex = 3;
             this.IsMinimizeOnCloseCheckbox.Text = "Minimize on close";
             this.IsMinimizeOnCloseCheckbox.UseVisualStyleBackColor = true;
@@ -195,9 +189,10 @@
             // IsMinimizeToNotificationCheckbox
             // 
             this.IsMinimizeToNotificationCheckbox.AutoSize = true;
-            this.IsMinimizeToNotificationCheckbox.Location = new System.Drawing.Point(160, 19);
+            this.IsMinimizeToNotificationCheckbox.Location = new System.Drawing.Point(107, 12);
+            this.IsMinimizeToNotificationCheckbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
             this.IsMinimizeToNotificationCheckbox.Name = "IsMinimizeToNotificationCheckbox";
-            this.IsMinimizeToNotificationCheckbox.Size = new System.Drawing.Size(224, 24);
+            this.IsMinimizeToNotificationCheckbox.Size = new System.Drawing.Size(156, 17);
             this.IsMinimizeToNotificationCheckbox.TabIndex = 2;
             this.IsMinimizeToNotificationCheckbox.Text = "Minimize to notification area";
             this.IsMinimizeToNotificationCheckbox.UseVisualStyleBackColor = true;
@@ -206,10 +201,9 @@
             // IsRunningCheckBox
             // 
             this.IsRunningCheckBox.AutoSize = true;
-            this.IsRunningCheckBox.Location = new System.Drawing.Point(9, 55);
-            this.IsRunningCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.IsRunningCheckBox.Location = new System.Drawing.Point(6, 36);
             this.IsRunningCheckBox.Name = "IsRunningCheckBox";
-            this.IsRunningCheckBox.Size = new System.Drawing.Size(127, 24);
+            this.IsRunningCheckBox.Size = new System.Drawing.Size(91, 17);
             this.IsRunningCheckBox.TabIndex = 1;
             this.IsRunningCheckBox.Text = "Start Running";
             this.IsRunningCheckBox.UseVisualStyleBackColor = true;
@@ -218,10 +212,9 @@
             // IsMinimizedCheckBox
             // 
             this.IsMinimizedCheckBox.AutoSize = true;
-            this.IsMinimizedCheckBox.Location = new System.Drawing.Point(9, 20);
-            this.IsMinimizedCheckBox.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.IsMinimizedCheckBox.Location = new System.Drawing.Point(6, 13);
             this.IsMinimizedCheckBox.Name = "IsMinimizedCheckBox";
-            this.IsMinimizedCheckBox.Size = new System.Drawing.Size(137, 24);
+            this.IsMinimizedCheckBox.Size = new System.Drawing.Size(97, 17);
             this.IsMinimizedCheckBox.TabIndex = 0;
             this.IsMinimizedCheckBox.Text = "Start Minimized";
             this.IsMinimizedCheckBox.UseVisualStyleBackColor = true;
@@ -230,11 +223,10 @@
             // AudioOptions
             // 
             this.AudioOptions.Controls.Add(this.groupBox1);
-            this.AudioOptions.Location = new System.Drawing.Point(4, 29);
-            this.AudioOptions.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.AudioOptions.Location = new System.Drawing.Point(4, 22);
             this.AudioOptions.Name = "AudioOptions";
-            this.AudioOptions.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.AudioOptions.Size = new System.Drawing.Size(428, 107);
+            this.AudioOptions.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.AudioOptions.Size = new System.Drawing.Size(283, 65);
             this.AudioOptions.TabIndex = 2;
             this.AudioOptions.Text = "Audio Options";
             this.AudioOptions.UseVisualStyleBackColor = true;
@@ -243,11 +235,9 @@
             // 
             this.groupBox1.Controls.Add(this.inaudible_sound);
             this.groupBox1.Controls.Add(this.silent_sound);
-            this.groupBox1.Location = new System.Drawing.Point(8, 6);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.groupBox1.Location = new System.Drawing.Point(5, 4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 5, 4, 5);
-            this.groupBox1.Size = new System.Drawing.Size(412, 94);
+            this.groupBox1.Size = new System.Drawing.Size(275, 61);
             this.groupBox1.TabIndex = 5;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Audio Type";
@@ -255,10 +245,9 @@
             // inaudible_sound
             // 
             this.inaudible_sound.AutoSize = true;
-            this.inaudible_sound.Location = new System.Drawing.Point(9, 22);
-            this.inaudible_sound.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.inaudible_sound.Location = new System.Drawing.Point(6, 14);
             this.inaudible_sound.Name = "inaudible_sound";
-            this.inaudible_sound.Size = new System.Drawing.Size(140, 24);
+            this.inaudible_sound.Size = new System.Drawing.Size(100, 17);
             this.inaudible_sound.TabIndex = 2;
             this.inaudible_sound.TabStop = true;
             this.inaudible_sound.Text = "Inaudible sound";
@@ -268,10 +257,9 @@
             // silent_sound
             // 
             this.silent_sound.AutoSize = true;
-            this.silent_sound.Location = new System.Drawing.Point(9, 55);
-            this.silent_sound.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
+            this.silent_sound.Location = new System.Drawing.Point(6, 36);
             this.silent_sound.Name = "silent_sound";
-            this.silent_sound.Size = new System.Drawing.Size(79, 24);
+            this.silent_sound.Size = new System.Drawing.Size(60, 17);
             this.silent_sound.TabIndex = 3;
             this.silent_sound.TabStop = true;
             this.silent_sound.Text = "Silence";
@@ -280,12 +268,11 @@
             // 
             // SPDIFKAGUI
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(442, 146);
+            this.ClientSize = new System.Drawing.Size(295, 95);
             this.Controls.Add(this.TabsMenu1);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.Name = "SPDIFKAGUI";
             this.ShowIcon = false;
             this.Text = "SPDIF-KA";
