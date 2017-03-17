@@ -99,40 +99,40 @@
             this.RightClickMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStart,
             this.toolStripSeparator1,
-            this.toolStripExit,
+            this.toolStripAbout,
             this.toolStripSeparator2,
-            this.toolStripAbout});
+            this.toolStripExit});
             this.RightClickMenuStrip.Name = "contextMenuStrip1";
-            this.RightClickMenuStrip.Size = new System.Drawing.Size(111, 82);
+            this.RightClickMenuStrip.Size = new System.Drawing.Size(153, 104);
             // 
             // toolStripStart
             // 
             this.toolStripStart.Name = "toolStripStart";
-            this.toolStripStart.Size = new System.Drawing.Size(110, 22);
+            this.toolStripStart.Size = new System.Drawing.Size(152, 22);
             this.toolStripStart.Text = "[temp]";
             this.toolStripStart.Click += new System.EventHandler(this.toolStripStart_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
             // 
             // toolStripExit
             // 
             this.toolStripExit.Name = "toolStripExit";
-            this.toolStripExit.Size = new System.Drawing.Size(110, 22);
+            this.toolStripExit.Size = new System.Drawing.Size(152, 22);
             this.toolStripExit.Text = "Exit";
             this.toolStripExit.Click += new System.EventHandler(this.toolStripExit_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(107, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
             // 
             // toolStripAbout
             // 
             this.toolStripAbout.Name = "toolStripAbout";
-            this.toolStripAbout.Size = new System.Drawing.Size(110, 22);
+            this.toolStripAbout.Size = new System.Drawing.Size(152, 22);
             this.toolStripAbout.Text = "About";
             this.toolStripAbout.Click += new System.EventHandler(this.toolStripAbout_Click);
             // 
@@ -154,7 +154,7 @@
             this.MainPage.Controls.Add(this.runningLabel);
             this.MainPage.Location = new System.Drawing.Point(4, 22);
             this.MainPage.Name = "MainPage";
-            this.MainPage.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.MainPage.Padding = new System.Windows.Forms.Padding(3);
             this.MainPage.Size = new System.Drawing.Size(283, 65);
             this.MainPage.TabIndex = 0;
             this.MainPage.Text = "Main";
@@ -168,7 +168,7 @@
             this.TabSettings.Controls.Add(this.IsMinimizedCheckBox);
             this.TabSettings.Location = new System.Drawing.Point(4, 22);
             this.TabSettings.Name = "TabSettings";
-            this.TabSettings.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.TabSettings.Padding = new System.Windows.Forms.Padding(3);
             this.TabSettings.Size = new System.Drawing.Size(283, 65);
             this.TabSettings.TabIndex = 1;
             this.TabSettings.Text = "Settings";
@@ -178,7 +178,7 @@
             // 
             this.IsMinimizeOnCloseCheckbox.AutoSize = true;
             this.IsMinimizeOnCloseCheckbox.Location = new System.Drawing.Point(107, 35);
-            this.IsMinimizeOnCloseCheckbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.IsMinimizeOnCloseCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.IsMinimizeOnCloseCheckbox.Name = "IsMinimizeOnCloseCheckbox";
             this.IsMinimizeOnCloseCheckbox.Size = new System.Drawing.Size(109, 17);
             this.IsMinimizeOnCloseCheckbox.TabIndex = 3;
@@ -190,7 +190,7 @@
             // 
             this.IsMinimizeToNotificationCheckbox.AutoSize = true;
             this.IsMinimizeToNotificationCheckbox.Location = new System.Drawing.Point(107, 12);
-            this.IsMinimizeToNotificationCheckbox.Margin = new System.Windows.Forms.Padding(2, 2, 2, 2);
+            this.IsMinimizeToNotificationCheckbox.Margin = new System.Windows.Forms.Padding(2);
             this.IsMinimizeToNotificationCheckbox.Name = "IsMinimizeToNotificationCheckbox";
             this.IsMinimizeToNotificationCheckbox.Size = new System.Drawing.Size(156, 17);
             this.IsMinimizeToNotificationCheckbox.TabIndex = 2;
@@ -225,7 +225,7 @@
             this.AudioOptions.Controls.Add(this.groupBox1);
             this.AudioOptions.Location = new System.Drawing.Point(4, 22);
             this.AudioOptions.Name = "AudioOptions";
-            this.AudioOptions.Padding = new System.Windows.Forms.Padding(3, 3, 3, 3);
+            this.AudioOptions.Padding = new System.Windows.Forms.Padding(3);
             this.AudioOptions.Size = new System.Drawing.Size(283, 65);
             this.AudioOptions.TabIndex = 2;
             this.AudioOptions.Text = "Audio Options";
