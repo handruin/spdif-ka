@@ -32,14 +32,14 @@
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(SPDIFKAGUI));
             this.startStopButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
-            this.spdifka = new System.Windows.Forms.NotifyIcon(this.components);
+            this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.runningLabel = new System.Windows.Forms.Label();
             this.RightClickMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.toolStripStart = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripExit = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripAbout = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStripExit = new System.Windows.Forms.ToolStripMenuItem();
             this.TabsMenu1 = new System.Windows.Forms.TabControl();
             this.MainPage = new System.Windows.Forms.TabPage();
             this.TabSettings = new System.Windows.Forms.TabPage();
@@ -51,6 +51,7 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.inaudible_sound = new System.Windows.Forms.RadioButton();
             this.silent_sound = new System.Windows.Forms.RadioButton();
+            this.DoubleClickTimer = new System.Windows.Forms.Timer(this.components);
             this.RightClickMenuStrip.SuspendLayout();
             this.TabsMenu1.SuspendLayout();
             this.MainPage.SuspendLayout();
@@ -78,11 +79,12 @@
             this.label1.TabIndex = 1;
             this.label1.Text = "SPDIF Keep Alive:";
             // 
-            // spdifka
+            // NotifyIcon
             // 
-            this.spdifka.Text = "SPDIF-KA";
-            this.spdifka.Visible = true;
-            this.spdifka.MouseClick += new System.Windows.Forms.MouseEventHandler(this.notifyIcon_MouseClick);
+            this.NotifyIcon.Text = "SPDIF-KA";
+            this.NotifyIcon.Visible = true;
+            this.NotifyIcon.MouseClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon_MouseClick);
+            this.NotifyIcon.MouseDoubleClick += new System.Windows.Forms.MouseEventHandler(this.NotifyIcon_MouseDoubleClick);
             // 
             // runningLabel
             // 
@@ -103,38 +105,38 @@
             this.toolStripSeparator2,
             this.toolStripExit});
             this.RightClickMenuStrip.Name = "contextMenuStrip1";
-            this.RightClickMenuStrip.Size = new System.Drawing.Size(153, 104);
+            this.RightClickMenuStrip.Size = new System.Drawing.Size(111, 82);
             // 
             // toolStripStart
             // 
             this.toolStripStart.Name = "toolStripStart";
-            this.toolStripStart.Size = new System.Drawing.Size(152, 22);
+            this.toolStripStart.Size = new System.Drawing.Size(110, 22);
             this.toolStripStart.Text = "[temp]";
             this.toolStripStart.Click += new System.EventHandler(this.toolStripStart_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(149, 6);
-            // 
-            // toolStripExit
-            // 
-            this.toolStripExit.Name = "toolStripExit";
-            this.toolStripExit.Size = new System.Drawing.Size(152, 22);
-            this.toolStripExit.Text = "Exit";
-            this.toolStripExit.Click += new System.EventHandler(this.toolStripExit_Click);
-            // 
-            // toolStripSeparator2
-            // 
-            this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(149, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(107, 6);
             // 
             // toolStripAbout
             // 
             this.toolStripAbout.Name = "toolStripAbout";
-            this.toolStripAbout.Size = new System.Drawing.Size(152, 22);
+            this.toolStripAbout.Size = new System.Drawing.Size(110, 22);
             this.toolStripAbout.Text = "About";
             this.toolStripAbout.Click += new System.EventHandler(this.toolStripAbout_Click);
+            // 
+            // toolStripSeparator2
+            // 
+            this.toolStripSeparator2.Name = "toolStripSeparator2";
+            this.toolStripSeparator2.Size = new System.Drawing.Size(107, 6);
+            // 
+            // toolStripExit
+            // 
+            this.toolStripExit.Name = "toolStripExit";
+            this.toolStripExit.Size = new System.Drawing.Size(110, 22);
+            this.toolStripExit.Text = "Exit";
+            this.toolStripExit.Click += new System.EventHandler(this.toolStripExit_Click);
             // 
             // TabsMenu1
             // 
@@ -266,6 +268,10 @@
             this.silent_sound.UseVisualStyleBackColor = true;
             this.silent_sound.CheckedChanged += new System.EventHandler(this.silent_sound_CheckedChanged);
             // 
+            // DoubleClickTimer
+            // 
+            this.DoubleClickTimer.Tick += new System.EventHandler(this.DoubleClickTimer_Tick);
+            // 
             // SPDIFKAGUI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -294,7 +300,7 @@
 
         private System.Windows.Forms.Button startStopButton;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.NotifyIcon spdifka;
+        private System.Windows.Forms.NotifyIcon NotifyIcon;
         private System.Windows.Forms.Label runningLabel;
         private System.Windows.Forms.ContextMenuStrip RightClickMenuStrip;
         private System.Windows.Forms.ToolStripMenuItem toolStripStart;
@@ -313,6 +319,7 @@
         private System.Windows.Forms.RadioButton silent_sound;
         private System.Windows.Forms.CheckBox IsMinimizeOnCloseCheckbox;
         private System.Windows.Forms.CheckBox IsMinimizeToNotificationCheckbox;
+        private System.Windows.Forms.Timer DoubleClickTimer;
     }
 }
 

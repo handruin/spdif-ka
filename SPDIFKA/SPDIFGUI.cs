@@ -29,14 +29,14 @@ namespace SPDIFKA
             this.Icon = Properties.Resources.bar_chart_64_red;
             this.MaximizeBox = false;
 
-            this.spdifka.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
-            this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
-            this.spdifka.BalloonTipTitle = name;
-            this.spdifka.Text = name + " - " + stoppedMessage;
-            this.spdifka.Icon = Properties.Resources.bar_chart_64_red;
+            this.NotifyIcon.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.NotifyIcon.BalloonTipText = name + " - " + stoppedMessage;
+            this.NotifyIcon.BalloonTipTitle = name;
+            this.NotifyIcon.Text = name + " - " + stoppedMessage;
+            this.NotifyIcon.Icon = Properties.Resources.bar_chart_64_red;
 
             toolStripStart.Text = toolStripStartText;
-            this.spdifka.ContextMenuStrip = RightClickMenuStrip;
+            this.NotifyIcon.ContextMenuStrip = RightClickMenuStrip;
             this.Resize += new System.EventHandler(this.Form1_Resize);
             runningLabel.Text = stoppedMessage;
             FormBorderStyle = FormBorderStyle.FixedSingle;
@@ -128,7 +128,7 @@ namespace SPDIFKA
         private void minimize()
         {
             
-            spdifka.Visible = true;
+            NotifyIcon.Visible = true;
             this.minimized_to_notificaton_area();
             
         }
@@ -166,10 +166,26 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
+        private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button.Equals(MouseButtons.Left))
             {
+                DoubleClickTimer.Interval = (int)(SystemInformation.DoubleClickTime);
+                DoubleClickTimer.Start(); // wait to ensure the user has not started a double click
+            }
+        }
+
+        private void DoubleClickTimer_Tick(object sender, EventArgs e)
+        {
+            DoubleClickTimer.Stop();
+            this.restore();
+        }
+
+        private void NotifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            if (e.Button.Equals(MouseButtons.Left))
+            {
+                DoubleClickTimer.Stop();
                 this.restore();
             }
         }
@@ -213,7 +229,7 @@ namespace SPDIFKA
         private void exit_application()
         {
             AudioControl.Instance.stop();  //Ensure audio stops before exiting.
-            spdifka.Icon = null;  //Ensure tray icon does not persist after close.
+            NotifyIcon.Icon = null;  //Ensure tray icon does not persist after close.
             Application.Exit();
         }
 
@@ -234,21 +250,21 @@ namespace SPDIFKA
         {
             if (!AudioControl.Instance.isRunning())
             {
-                this.spdifka.Text = name + " - " + startMessage;
+                this.NotifyIcon.Text = name + " - " + startMessage;
                 toolStripStart.Text = toolStripStopText;
                 runningLabel.Text = startMessage;
-                this.spdifka.BalloonTipText = name + " - " + startMessage;
+                this.NotifyIcon.BalloonTipText = name + " - " + startMessage;
                 startStopButton.Text = "Stop";
                 AudioControl.Instance.start();
                 this.updateTrayIconWhenRunning(true);
             }
             else
             {
-                this.spdifka.Text = name + " - " + stoppedMessage;
+                this.NotifyIcon.Text = name + " - " + stoppedMessage;
                 startStopButton.Text = "Start";
                 toolStripStart.Text = toolStripStartText;
                 runningLabel.Text = stoppedMessage;
-                this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
+                this.NotifyIcon.BalloonTipText = name + " - " + stoppedMessage;
                 AudioControl.Instance.stop();
                 this.updateTrayIconWhenRunning(false);
             }
@@ -274,12 +290,12 @@ namespace SPDIFKA
         {
             if (isRunning)
             {
-                spdifka.Icon = Properties.Resources.bar_chart_64_green;
+                NotifyIcon.Icon = Properties.Resources.bar_chart_64_green;
                 this.Icon = Properties.Resources.bar_chart_64_green;
             }
             else
             {
-                spdifka.Icon = Properties.Resources.bar_chart_64_red;
+                NotifyIcon.Icon = Properties.Resources.bar_chart_64_red;
                 this.Icon = Properties.Resources.bar_chart_64_red;
             }
         }
