@@ -1,18 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Specialized;
 
 namespace SPDIFKA {
-    class UserPreferences {
+    public class UserPreferences {
         public const string DEFAULT_AUDIO_DEVICE = "Default playback device";
 
         public enum Sound { Silent, Inaudible }
         public bool IsRunning { get; set; }
         public bool IsHidden { get; set; }
         public bool IsStartWithWindows { get; set; }
+        public bool IsMinimizeToNotificationArea { get; set; }
+        public bool IsMinimizedOnClose { get; set; }
         public Sound SoundType { get; set; }
         public StringCollection EnabledDeviceNames { get; set; }
 
@@ -24,6 +21,8 @@ namespace SPDIFKA {
             Properties.Settings.Default.IsHidden = this.IsHidden;
             Properties.Settings.Default.IsRunning = this.IsRunning;
             Properties.Settings.Default.IsStartWithWindows = this.IsStartWithWindows;
+            Properties.Settings.Default.IsMinimizedNotification = this.IsMinimizeToNotificationArea;
+            Properties.Settings.Default.IsMinimizedOnClose = this.IsMinimizedOnClose;
             Properties.Settings.Default.SoundType = this.SoundType.ToString();
             Properties.Settings.Default.EnabledDeviceNames = this.EnabledDeviceNames;
             Properties.Settings.Default.Save();
@@ -32,6 +31,8 @@ namespace SPDIFKA {
         public void Load() {
             this.IsHidden = Properties.Settings.Default.IsHidden;
             this.IsRunning = Properties.Settings.Default.IsRunning;
+            this.IsMinimizeToNotificationArea = Properties.Settings.Default.IsMinimizedNotification;
+            this.IsMinimizedOnClose = Properties.Settings.Default.IsMinimizedOnClose;
             this.IsStartWithWindows = Properties.Settings.Default.IsStartWithWindows;
             if (Properties.Settings.Default.SoundType == "Silent") {
                 this.SoundType = Sound.Silent;

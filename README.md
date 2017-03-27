@@ -7,7 +7,7 @@ Some sound cards will stop the S/PDIF link when no sound is actively being playe
 This utility plays a mono-channel WAV file which contains no sound.  This tricks the sounds card and/or Windows mixer into opening the audio connection to the receiver/DAC via the S/PDIF link.  With this tool running, you will no longer have a delay.
 
 ### Known issues
-- If you use utilities like foobar200 with a WASAPI plugin, you may encounter some strange behaviour with this tool.  
+- If you use utilities like foobar2000 with a WASAPI plugin, you may encounter some strange behaviour with this tool.  
 
 ### Tested platforms
 - At this time, spdif-ka has been tested under Windows 8.1 64-bit, Windows 10 64-bit using the .net framework 4.5.
@@ -19,6 +19,7 @@ This utility plays a mono-channel WAV file which contains no sound.  This tricks
 - Runs in the windows system tray and displays a green icon when the keep-alive is running.
 - Support for saving configuration settings so that when you exit the utility the same settings will be applied when spdif-ka is restarted.
 - New support for audio selection type.  The inaudible audio option is the default option to be used when needing to keep an audio channel open.  The silent audio option can be used in special cases and is currently experimental for some use-cases.
+- New support for minimizing to notification area on exit.  Minimizing the application can now minimize to task bar instead of notification area.
 
 ### GUI Screen captures
 - Main screen of the utility
@@ -27,3 +28,12 @@ This utility plays a mono-channel WAV file which contains no sound.  This tricks
 - Settings tab
 
 ![ScreenShot](/screen-captures/spdif-ka_sc2.jpg)
+- Audio Type tab
+
+![ScreenShot](/screen-captures/spdif-ka_sc3.jpg)
+- Notification tray icon
+
+![ScreenShot](/screen-captures/spdif-ka_sc4.jpg)
+- Notification tray right click menu
+
+![ScreenShot](/screen-captures/spdif-ka_sc5.jpg)

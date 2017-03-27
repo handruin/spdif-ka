@@ -70,7 +70,6 @@ namespace SPDIFKA {
 
     class AudioControl {
         public static readonly Lazy<AudioControl> Instance = new Lazy<AudioControl>(() => new AudioControl());
-        private static readonly UserPreferences UserPerfs = new UserPreferences();
 
         public bool IsRunning { get; private set; }
         private List<ILoopAudioPlayer> AudioPlayers = new List<ILoopAudioPlayer>();
@@ -80,11 +79,11 @@ namespace SPDIFKA {
         /// Start the audio playback which will keep the SPDIF link alive.
         /// </summary>
         public void Start() {
-            UserPerfs.Load(); //Reload preferences to make sure the latest sound type is applied.
+            SPDIFKAGUI.UserPrefs.Load(); //Reload preferences to make sure the latest sound type is applied.
             foreach (var player in this.AudioPlayers) {
                 player.TryDispose();
             }
-            switch (UserPerfs.SoundType) {
+            switch (SPDIFKAGUI.UserPrefs.SoundType) {
                 case UserPreferences.Sound.Silent:
                     this.Sound = Properties.Resources.blank;
                     var players = PlaySoundAsync(Properties.Resources.inaudible);
@@ -112,7 +111,7 @@ namespace SPDIFKA {
 
         private static List<ILoopAudioPlayer> PlaySoundAsync(UnmanagedMemoryStream sound) {
             var deviceIds = new HashSet<int>();
-            foreach (var deviceName in UserPerfs.EnabledDeviceNames) {
+            foreach (var deviceName in SPDIFKAGUI.UserPrefs.EnabledDeviceNames) {
                 if (deviceName == UserPreferences.DEFAULT_AUDIO_DEVICE) {
                     deviceIds.Add(-1);
                 }

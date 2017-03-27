@@ -19,7 +19,7 @@ namespace SPDIFKA {
                                            .GetName()
                                            .Version
                                            .ToString();
-        private static readonly UserPreferences UserPrefs = new UserPreferences();
+        public static readonly UserPreferences UserPrefs = new UserPreferences();
         private readonly bool IsInitializing;
 
         /// <summary>
@@ -29,6 +29,9 @@ namespace SPDIFKA {
             this.IsInitializing = true;
             this.InitializeComponent();
 
+            this.ShowIcon = true;
+            this.Icon = Properties.Resources.bar_chart_64_red;
+
             // Create the ToolTip and associate with the Form container.
             var toolTip1 = new ToolTip {
                 AutoPopDelay = 10000,
@@ -37,13 +40,13 @@ namespace SPDIFKA {
                 ShowAlways = true
             };
             toolTip1.SetToolTip(this.IsStartWithWindowsCheckbox, "If checked, will add a shortcut to the current executable in Windows Start Menu Startup Folder for the current user. Uncheck to delete the shortcut.");
-
             this.MaximizeBox = false;
 
             this.spdifka.BalloonTipIcon = ToolTipIcon.Info;
             this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
             this.spdifka.BalloonTipTitle = name;
             this.spdifka.Text = name + " - " + stoppedMessage;
+            this.spdifka.Icon = Properties.Resources.bar_chart_64_red;
 
             this.toolStripStart.Text = toolStripStartText;
             this.spdifka.ContextMenuStrip = this.RightClickMenuStrip;
@@ -74,21 +77,14 @@ namespace SPDIFKA {
             //Update the visual check boxes with saved state.
             this.IsMinimizedCheckBox.Checked = UserPrefs.IsHidden;
             this.IsRunningCheckBox.Checked = UserPrefs.IsRunning;
-            if (UserPrefs.SoundType == UserPreferences.Sound.Silent) {
-                this.silent_sound.Checked = true;
-                this.inaudible_sound.Checked = false;
-            }
-
-            if (UserPrefs.SoundType == UserPreferences.Sound.Inaudible) {
-                this.silent_sound.Checked = false;
-                this.inaudible_sound.Checked = true;
-            }
+            this.IsMinimizeToNotificationCheckbox.Checked = UserPrefs.IsMinimizeToNotificationArea;
+            this.IsMinimizeOnCloseCheckbox.Checked = UserPrefs.IsMinimizedOnClose;
+            this.silent_sound.Checked = UserPrefs.SoundType == UserPreferences.Sound.Silent;
+            this.inaudible_sound.Checked = UserPrefs.SoundType == UserPreferences.Sound.Inaudible;
             this.IsStartWithWindowsCheckbox.Checked = UserPrefs.IsStartWithWindows;
-
             if (UserPrefs.IsHidden) {
                 this.Minimize();
             }
-
             if (UserPrefs.IsRunning) {
                 this.ToggleStartStop();
             }
@@ -192,10 +188,23 @@ namespace SPDIFKA {
         /// Minimize the application into the task bar.
         /// </summary>
         private void Minimize() {
-            this.isAppVisible = false;
+
             this.spdifka.Visible = true;
-            this.ShowInTaskbar = false;
-            this.Hide();
+            this.minimized_to_notificaton_area();
+
+        }
+
+        private void minimized_to_notificaton_area() {
+            if (UserPrefs.IsMinimizeToNotificationArea) {
+                this.isAppVisible = false;
+                this.ShowInTaskbar = false;
+                this.Hide();
+            }
+            else {
+                this.isAppVisible = true;
+                this.WindowState = FormWindowState.Minimized;
+                this.ShowInTaskbar = true;
+            }
         }
 
         /// <summary>
@@ -206,6 +215,7 @@ namespace SPDIFKA {
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
             this.Show();
+            this.Activate();
         }
 
         /// <summary>
@@ -235,6 +245,23 @@ namespace SPDIFKA {
         /// <param name="e"></param>
         private void toolStripExit_Click(object sender, EventArgs e) {
             AudioControl.Instance.Value.Stop();  //Ensure audio stops before exiting.
+            this.Exit_application();
+        }
+
+        private void SPDIFKAGUI_FormClosing(object sender, FormClosingEventArgs e) {
+            if (e.CloseReason == CloseReason.UserClosing) {
+                if (UserPrefs.IsMinimizedOnClose) {
+                    this.Minimize();
+                    e.Cancel = true;
+                }
+                else {
+                    this.Exit_application();
+                }
+            }
+        }
+
+        private void Exit_application() {
+            this.spdifka.Icon = null;  //Ensure tray icon does not persist after close.
             Application.Exit();
         }
 
@@ -244,7 +271,7 @@ namespace SPDIFKA {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void toolStripAbout_Click(object sender, EventArgs e) {
-            MessageBox.Show("Copyright 2016 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Copyright 2017 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -256,21 +283,21 @@ namespace SPDIFKA {
                 this.toolStripStart.Text = toolStripStopText;
                 this.runningLabel.Text = startMessage;
                 this.spdifka.BalloonTipText = name + " - " + startMessage;
-                this.startStopButton.Text = "stop";
+                this.startStopButton.Text = "Stop";
                 AudioControl.Instance.Value.Start();
                 this.UpdateTrayIconWhenRunning(isRunning: true);
             }
             else {
                 this.spdifka.Text = name + " - " + stoppedMessage;
-                this.startStopButton.Text = "start";
+                this.startStopButton.Text = "Start";
                 this.toolStripStart.Text = toolStripStartText;
                 this.runningLabel.Text = stoppedMessage;
                 this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
                 AudioControl.Instance.Value.Stop();
                 this.UpdateTrayIconWhenRunning(isRunning: false);
             }
-        }
-
+        }      
+        
         /// <summary>
         /// Restart the audio control only if the audio was already running.
         /// </summary>
@@ -282,21 +309,18 @@ namespace SPDIFKA {
         }
 
         /// <summary>
-        /// Restart the audio control if the audio was already running, or start it.
-        /// </summary>
-        private void StartOrRestartAudioControl() {
-            if (AudioControl.Instance.Value.IsRunning) {
-                AudioControl.Instance.Value.Stop();
-            }
-            AudioControl.Instance.Value.Start();
-        }
-
-        /// <summary>
         /// Update the visual icon in the tray to represent the application state.
         /// </summary>
         /// <param name="isRunning"></param>
         private void UpdateTrayIconWhenRunning(bool isRunning) {
-            this.spdifka.Icon = isRunning ? Properties.Resources.bar_chart_64_green : Properties.Resources.bar_chart_64_white;
+            if (isRunning) {
+                this.spdifka.Icon = Properties.Resources.bar_chart_64_green;
+                this.Icon = Properties.Resources.bar_chart_64_green;
+            }
+            else {
+                this.spdifka.Icon = Properties.Resources.bar_chart_64_red;
+                this.Icon = Properties.Resources.bar_chart_64_red;
+            }
         }
 
         /// <summary>
@@ -318,6 +342,18 @@ namespace SPDIFKA {
         private void IsRunningCheckBox_CheckedChanged(object sender, EventArgs e) {
             if (this.IsInitializing) return;
             UserPrefs.IsRunning = this.IsRunningCheckBox.Checked;
+            UserPrefs.Save();
+        }
+
+        private void MinimizeToNotification_CheckedChanged(object sender, EventArgs e) {
+            if (this.IsInitializing) return;
+            UserPrefs.IsMinimizeToNotificationArea = this.IsMinimizeToNotificationCheckbox.Checked;
+            UserPrefs.Save();
+        }
+
+        private void MinimizeToNotificationOnClose_CheckedChanged(object sender, EventArgs e) {
+            if (this.IsInitializing) return;
+            UserPrefs.IsMinimizedOnClose = this.IsMinimizeOnCloseCheckbox.Checked;
             UserPrefs.Save();
         }
 
