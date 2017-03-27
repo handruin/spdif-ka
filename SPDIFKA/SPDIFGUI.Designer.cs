@@ -211,7 +211,7 @@
             this.IsMinimizeOnCloseCheckbox.TabIndex = 3;
             this.IsMinimizeOnCloseCheckbox.Text = "Minimize on close";
             this.IsMinimizeOnCloseCheckbox.UseVisualStyleBackColor = true;
-            this.IsMinimizeOnCloseCheckbox.CheckedChanged += new System.EventHandler(this.MinimizToNotificationOnClose_CheckedChanged);
+            this.IsMinimizeOnCloseCheckbox.CheckedChanged += new System.EventHandler(this.MinimizeToNotificationOnClose_CheckedChanged);
             // 
             // IsMinimizeToNotificationCheckbox
             // 
@@ -223,7 +223,7 @@
             this.IsMinimizeToNotificationCheckbox.TabIndex = 2;
             this.IsMinimizeToNotificationCheckbox.Text = "Minimize to notification area";
             this.IsMinimizeToNotificationCheckbox.UseVisualStyleBackColor = true;
-            this.IsMinimizeToNotificationCheckbox.CheckedChanged += new System.EventHandler(this.minimizeToNotification_CheckedChanged);
+            this.IsMinimizeToNotificationCheckbox.CheckedChanged += new System.EventHandler(this.MinimizeToNotification_CheckedChanged);
             // 
             // IsRunningCheckBox
             // 
