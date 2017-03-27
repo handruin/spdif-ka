@@ -1,44 +1,57 @@
 ﻿using System;
-using System.Threading;
+using System.IO;
 using System.Windows.Forms;
+using Microsoft.Win32;
+using NAudio.Wave;
+using SPDIFKA.Lib;
 
-namespace SPDIFKA
-{
-    public partial class SPDIFKAGUI : Form
-    {
-        private static String name = "SPDIF-KA";
-        private static String stoppedMessage = "stopped";
-        private static String startMessage = "running";
-        private static String toolStripStartText = "Start " + name;
-        private static String toolStripStopText = "Stop " + name;
+namespace SPDIFKA {
+    public partial class SPDIFKAGUI : Form {
+        private const string name = "SPDIF-KA";
+        private const string stoppedMessage = "stopped";
+        private const string startMessage = "running";
+        private static string toolStripStartText = "Start " + name;
+        private static string toolStripStopText = "Stop " + name;
+        private const string UNPLUGGED_SUFFIX = " (*Unplugged*)";
         private bool isAppVisible = true;
 
-        private static String version = System.Reflection.Assembly.GetExecutingAssembly()
+        private static readonly string version = System.Reflection.Assembly.GetExecutingAssembly()
                                            .GetName()
                                            .Version
                                            .ToString();
-        private static UserPreferences UserPerfs = new UserPreferences();
+        private static readonly UserPreferences UserPrefs = new UserPreferences();
+        private readonly bool IsInitializing;
 
         /// <summary>
         /// General initialization.
         /// </summary>
-        public SPDIFKAGUI()
-        {
-            InitializeComponent();
+        public SPDIFKAGUI() {
+            this.IsInitializing = true;
+            this.InitializeComponent();
+
+            // Create the ToolTip and associate with the Form container.
+            var toolTip1 = new ToolTip {
+                AutoPopDelay = 10000,
+                InitialDelay = 500,
+                ReshowDelay = 500,
+                ShowAlways = true
+            };
+            toolTip1.SetToolTip(this.IsStartWithWindowsCheckbox, "If checked, will add a shortcut to the current executable in Windows Start Menu Startup Folder for the current user. Uncheck to delete the shortcut.");
 
             this.MaximizeBox = false;
 
-            this.spdifka.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.spdifka.BalloonTipIcon = ToolTipIcon.Info;
             this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
             this.spdifka.BalloonTipTitle = name;
             this.spdifka.Text = name + " - " + stoppedMessage;
-            
-            toolStripStart.Text = toolStripStartText;
-            this.spdifka.ContextMenuStrip = RightClickMenuStrip;
-            this.Resize += new System.EventHandler(this.Form1_Resize);
-            runningLabel.Text = stoppedMessage;
-            FormBorderStyle = FormBorderStyle.FixedSingle;
-            this.loadState();
+
+            this.toolStripStart.Text = toolStripStartText;
+            this.spdifka.ContextMenuStrip = this.RightClickMenuStrip;
+            this.Resize += this.Form1_Resize;
+            this.runningLabel.Text = stoppedMessage;
+            this.FormBorderStyle = FormBorderStyle.FixedSingle;
+            this.LoadState();
+            this.IsInitializing = false;
         }
 
         /// <summary>
@@ -46,12 +59,10 @@ namespace SPDIFKA
         /// This now allows the utility to start minimized and hides this utility from the alt + tab menu.
         /// </summary>
         /// <param name="isVisible"></param>
-        protected override void SetVisibleCore(bool isVisible)
-        {
-            if (!isAppVisible)
-            {
+        protected override void SetVisibleCore(bool isVisible) {
+            if (!this.isAppVisible) {
                 isVisible = false;
-                if (!this.IsHandleCreated) CreateHandle();
+                if (!this.IsHandleCreated) this.CreateHandle();
             }
             base.SetVisibleCore(isVisible);
         }
@@ -59,40 +70,102 @@ namespace SPDIFKA
         /// <summary>
         /// Load the settings and state of the application that were previously saved.
         /// </summary>
-        private void loadState()
-        {
+        private void LoadState() {
             //Update the visual check boxes with saved state.
-            IsMinimizedCheckBox.Checked = UserPerfs.IsHidden;
-            IsRunningCheckBox.Checked = UserPerfs.IsRunning;
-            if (UserPerfs.SoundType == UserPreferences.Sound.Silent)
-            {
-                silent_sound.Checked = true;
-                inaudible_sound.Checked = false;
+            this.IsMinimizedCheckBox.Checked = UserPrefs.IsHidden;
+            this.IsRunningCheckBox.Checked = UserPrefs.IsRunning;
+            if (UserPrefs.SoundType == UserPreferences.Sound.Silent) {
+                this.silent_sound.Checked = true;
+                this.inaudible_sound.Checked = false;
             }
 
-            if (UserPerfs.SoundType == UserPreferences.Sound.Inaudible)
-            {
-                silent_sound.Checked = false;
-                inaudible_sound.Checked = true;
+            if (UserPrefs.SoundType == UserPreferences.Sound.Inaudible) {
+                this.silent_sound.Checked = false;
+                this.inaudible_sound.Checked = true;
+            }
+            this.IsStartWithWindowsCheckbox.Checked = UserPrefs.IsStartWithWindows;
+
+            if (UserPrefs.IsHidden) {
+                this.Minimize();
             }
 
-            if (UserPerfs.IsHidden)
-            {
-                this.minimize();
+            if (UserPrefs.IsRunning) {
+                this.ToggleStartStop();
             }
-            
-            if (UserPerfs.IsRunning)
-            {
-                manageStartStop();
+            this.ReloadDevices();
+            this.RegisterOrUnregisterUsbDeviceNotificationBasedOnEnabledDevices();
+            SystemEvents.PowerModeChanged += this.OnPowerChange;
+        }
+
+        private void OnPowerChange(object s, PowerModeChangedEventArgs e) {
+            switch (e.Mode) {
+                case PowerModes.Resume:
+                    this.ReloadDevices();
+                    this.RestartAudioControlIfRunning();
+                    break;
+                case PowerModes.Suspend:
+                    break;
+            }
+        }
+
+        private bool IsRegisteredToUsbDeviceNotification = false;
+        private void RegisterOrUnregisterUsbDeviceNotificationBasedOnEnabledDevices() {
+            foreach (var deviceName in UserPrefs.EnabledDeviceNames) {
+                if (deviceName != UserPreferences.DEFAULT_AUDIO_DEVICE) {
+                    if (!this.IsRegisteredToUsbDeviceNotification) {
+                        this.IsRegisteredToUsbDeviceNotification = true;
+                        UsbNotification.RegisterUsbDeviceNotification(this.Handle);
+                    }
+                    return;
+                }
+            }
+            if (this.IsRegisteredToUsbDeviceNotification) {
+                this.IsRegisteredToUsbDeviceNotification = false;
+                UsbNotification.UnregisterUsbDeviceNotification();
+            }
+        }
+
+        protected override void WndProc(ref Message m) {
+            base.WndProc(ref m);
+            if (m.Msg == UsbNotification.WmDevicechange) {
+                switch ((int)m.WParam) {
+                    case UsbNotification.DbtDeviceremovecomplete:
+                        this.ReloadDevices();
+                        this.RestartAudioControlIfRunning();
+                        break;
+                    case UsbNotification.DbtDevicearrival:
+                        this.ReloadDevices();
+                        this.RestartAudioControlIfRunning();
+                        break;
+                }
+            }
+        }
+
+        private void ReloadDevices() {
+            if (WaveOut.DeviceCount <= 0) return;
+            this.comboBoxWaveOutDevice.Items.Clear();
+            this.comboBoxWaveOutDevice.Items.Add(UserPreferences.DEFAULT_AUDIO_DEVICE);
+            for (var deviceId = -1; deviceId < WaveOut.DeviceCount; deviceId++) {
+                var capabilities = WaveOut.GetCapabilities(deviceId);
+                this.comboBoxWaveOutDevice.Items.Add(capabilities.ProductName);
+            }
+            foreach (var deviceName in UserPrefs.EnabledDeviceNames) {
+                var found = false;
+                for (int i = 0; i < this.comboBoxWaveOutDevice.Items.Count; i++) {
+                    if (this.comboBoxWaveOutDevice.Items[i].ToString().Replace(UNPLUGGED_SUFFIX, "") == deviceName) {
+                        this.comboBoxWaveOutDevice.SetItemChecked(i, true);
+                        found = true;
+                    }
+                }
+                if (!found) this.comboBoxWaveOutDevice.Items.Add(deviceName + UNPLUGGED_SUFFIX);
             }
         }
 
         /// <summary>
         /// General destructor
         /// </summary>
-        ~SPDIFKAGUI()
-        {
-            this.Resize -= new System.EventHandler(this.Form1_Resize);
+        ~SPDIFKAGUI() {
+            this.Resize -= this.Form1_Resize;
         }
 
         /// <summary>
@@ -100,9 +173,8 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void startButton_Click(object sender, EventArgs e)
-        {
-            manageStartStop();
+        private void startButton_Click(object sender, EventArgs e) {
+            this.ToggleStartStop();
         }
 
         /// <summary>
@@ -110,34 +182,30 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void Form1_Resize(object sender, EventArgs e)
-        {
-            if (this.WindowState == FormWindowState.Minimized)
-            {
-                this.minimize();
+        private void Form1_Resize(object sender, EventArgs e) {
+            if (this.WindowState == FormWindowState.Minimized) {
+                this.Minimize();
             }
         }
 
         /// <summary>
         /// Minimize the application into the task bar.
         /// </summary>
-        private void minimize()
-        {
+        private void Minimize() {
             this.isAppVisible = false;
-            spdifka.Visible = true;
-            this.ShowInTaskbar = false;            
+            this.spdifka.Visible = true;
+            this.ShowInTaskbar = false;
             this.Hide();
         }
 
         /// <summary>
         /// Restore the window to normal user operation mode.
         /// </summary>
-        private void restore()
-        {
+        private void Restore() {
             this.isAppVisible = true;
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
-            this.Show();           
+            this.Show();
         }
 
         /// <summary>
@@ -145,11 +213,9 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void notifyIcon_MouseClick(object sender, MouseEventArgs e)
-        {
-            if (e.Button.Equals(MouseButtons.Left))
-            {
-                this.restore();
+        private void notifyIcon_MouseClick(object sender, MouseEventArgs e) {
+            if (e.Button.Equals(MouseButtons.Left)) {
+                this.Restore();
             }
         }
 
@@ -158,9 +224,8 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void toolStripStart_Click(object sender, EventArgs e)
-        {
-            manageStartStop();
+        private void toolStripStart_Click(object sender, EventArgs e) {
+            this.ToggleStartStop();
         }
 
         /// <summary>
@@ -168,9 +233,8 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void toolStripExit_Click(object sender, EventArgs e)
-        {
-            AudioControl.Instance.stop();  //Ensure audio stops before exiting.
+        private void toolStripExit_Click(object sender, EventArgs e) {
+            AudioControl.Instance.Value.Stop();  //Ensure audio stops before exiting.
             Application.Exit();
         }
 
@@ -179,64 +243,60 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void toolStripAbout_Click(object sender, EventArgs e)
-        {
+        private void toolStripAbout_Click(object sender, EventArgs e) {
             MessageBox.Show("Copyright 2016 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
         /// Generic method to handle the starting and stopping of the SPDIF keep alive audio clip playback.
         /// </summary>
-        private void manageStartStop()
-        {
-            if (!AudioControl.Instance.isRunning())
-            {
+        private void ToggleStartStop() {
+            if (!AudioControl.Instance.Value.IsRunning) {
                 this.spdifka.Text = name + " - " + startMessage;
-                toolStripStart.Text = toolStripStopText;
-                runningLabel.Text = startMessage;
+                this.toolStripStart.Text = toolStripStopText;
+                this.runningLabel.Text = startMessage;
                 this.spdifka.BalloonTipText = name + " - " + startMessage;
-                startStopButton.Text = "stop";
-                AudioControl.Instance.start();
-                this.updateTrayIconWhenRunning(true);
+                this.startStopButton.Text = "stop";
+                AudioControl.Instance.Value.Start();
+                this.UpdateTrayIconWhenRunning(isRunning: true);
             }
-            else
-            {
+            else {
                 this.spdifka.Text = name + " - " + stoppedMessage;
-                startStopButton.Text = "start";
-                toolStripStart.Text = toolStripStartText;
-                runningLabel.Text = stoppedMessage;
+                this.startStopButton.Text = "start";
+                this.toolStripStart.Text = toolStripStartText;
+                this.runningLabel.Text = stoppedMessage;
                 this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
-                AudioControl.Instance.stop();
-                this.updateTrayIconWhenRunning(false);
+                AudioControl.Instance.Value.Stop();
+                this.UpdateTrayIconWhenRunning(isRunning: false);
             }
         }
 
         /// <summary>
         /// Restart the audio control only if the audio was already running.
         /// </summary>
-        private void restartAudioControl()
-        {
-            if (AudioControl.Instance.isRunning())
-            {
-                AudioControl.Instance.stop();
-                AudioControl.Instance.start();
+        private void RestartAudioControlIfRunning() {
+            if (AudioControl.Instance.Value.IsRunning) {
+                AudioControl.Instance.Value.Stop();
+                AudioControl.Instance.Value.Start();
             }
+        }
+
+        /// <summary>
+        /// Restart the audio control if the audio was already running, or start it.
+        /// </summary>
+        private void StartOrRestartAudioControl() {
+            if (AudioControl.Instance.Value.IsRunning) {
+                AudioControl.Instance.Value.Stop();
+            }
+            AudioControl.Instance.Value.Start();
         }
 
         /// <summary>
         /// Update the visual icon in the tray to represent the application state.
         /// </summary>
         /// <param name="isRunning"></param>
-        private void updateTrayIconWhenRunning(Boolean isRunning)
-        {            
-            if (isRunning)
-            {
-                spdifka.Icon = Properties.Resources.bar_chart_64_green;
-            }
-            else
-            {
-                spdifka.Icon = Properties.Resources.bar_chart_64_white;
-            }
+        private void UpdateTrayIconWhenRunning(bool isRunning) {
+            this.spdifka.Icon = isRunning ? Properties.Resources.bar_chart_64_green : Properties.Resources.bar_chart_64_white;
         }
 
         /// <summary>
@@ -244,10 +304,10 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IsMinimizedCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UserPerfs.IsHidden = IsMinimizedCheckBox.Checked;
-            UserPerfs.Save();
+        private void IsMinimizedCheckBox_CheckedChanged(object sender, EventArgs e) {
+            if (this.IsInitializing) return;
+            UserPrefs.IsHidden = this.IsMinimizedCheckBox.Checked;
+            UserPrefs.Save();
         }
 
         /// <summary>
@@ -255,10 +315,23 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void IsRunningCheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            UserPerfs.IsRunning = IsRunningCheckBox.Checked;
-            UserPerfs.Save();
+        private void IsRunningCheckBox_CheckedChanged(object sender, EventArgs e) {
+            if (this.IsInitializing) return;
+            UserPrefs.IsRunning = this.IsRunningCheckBox.Checked;
+            UserPrefs.Save();
+        }
+
+        private void IsStartWithWindowsCheckbox_CheckedChanged(object sender, EventArgs e) {
+            if (this.IsInitializing) return;
+            UserPrefs.IsStartWithWindows = this.IsStartWithWindowsCheckbox.Checked;
+            var targetPath = System.Reflection.Assembly.GetEntryAssembly().Location;
+            if (UserPrefs.IsStartWithWindows) {
+                ShortcutToolbox.CreateShortcutInStartUpFolder(targetPath: targetPath, startInFolderPath: Path.GetDirectoryName(Application.StartupPath), description: "");
+            }
+            else {
+                ShortcutToolbox.DeleteShortcutInStartUpFolder(targetPath: targetPath);
+            }
+            UserPrefs.Save();
         }
 
         /// <summary>
@@ -266,13 +339,12 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void inaudible_sound_CheckedChanged(object sender, EventArgs e)
-        {
-            if (inaudible_sound.Checked)
-            {
-                UserPerfs.SoundType = UserPreferences.Sound.Inaudible;
-                UserPerfs.Save();
-                restartAudioControl();
+        private void inaudible_sound_CheckedChanged(object sender, EventArgs e) {
+            if (this.IsInitializing) return;
+            if (this.inaudible_sound.Checked) {
+                UserPrefs.SoundType = UserPreferences.Sound.Inaudible;
+                UserPrefs.Save();
+                this.RestartAudioControlIfRunning();
             }
         }
 
@@ -281,14 +353,36 @@ namespace SPDIFKA
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void silent_sound_CheckedChanged(object sender, EventArgs e)
-        {
-            if (silent_sound.Checked)
-            {
-                UserPerfs.SoundType = UserPreferences.Sound.Silent;
-                UserPerfs.Save();
-                restartAudioControl();
+        private void silent_sound_CheckedChanged(object sender, EventArgs e) {
+            if (this.IsInitializing) return;
+            if (this.silent_sound.Checked) {
+                UserPrefs.SoundType = UserPreferences.Sound.Silent;
+                UserPrefs.Save();
+                this.RestartAudioControlIfRunning();
             }
+        }
+
+        private void comboBoxWaveOutDevice_SelectedIndexChanged(object sender, EventArgs e) {
+            if (this.IsInitializing) return;
+            if (UserPrefs.EnabledDeviceNames == null) {
+                UserPrefs.EnabledDeviceNames = Properties.Settings.Default.EnabledDeviceNames;
+                UserPrefs.Save();
+            }
+            UserPrefs.EnabledDeviceNames.Clear();
+            for (int i = 0; i < this.comboBoxWaveOutDevice.Items.Count; i++) {
+                var deviceName = this.comboBoxWaveOutDevice.Items[i].ToString().Replace(UNPLUGGED_SUFFIX, "");
+                if (this.comboBoxWaveOutDevice.GetItemChecked(i)) {
+                    if (!UserPrefs.EnabledDeviceNames.Contains(deviceName)) {
+                        UserPrefs.EnabledDeviceNames.Add(deviceName);
+                    }
+                }
+                else {
+                    UserPrefs.EnabledDeviceNames.Remove(deviceName);
+                }
+            }
+            UserPrefs.Save();
+            this.RegisterOrUnregisterUsbDeviceNotificationBasedOnEnabledDevices();
+            this.RestartAudioControlIfRunning();
         }
     }
 }

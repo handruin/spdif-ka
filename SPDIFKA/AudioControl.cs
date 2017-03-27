@@ -2,113 +2,185 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Media;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
+using NAudio.Wave;
+using SPDIFKA.Lib;
 
-namespace SPDIFKA
-{
-    class AudioControl
-    {
-        private Boolean isSoundStarted = false;
-        private SoundPlayer sound;
-        private static AudioControl instance;
-        private static UserPreferences UserPerfs = new UserPreferences();
-        private UnmanagedMemoryStream sound_type;
+namespace SPDIFKA {
+    interface ILoopAudioPlayer : IDisposable {
+        void TryDispose();
+    }
 
-        private AudioControl() { }
+    class DefaultLoopAudioPlayer : ILoopAudioPlayer {
+        private readonly UnmanagedMemoryStream Stream;
+        private SoundPlayer SoundPlayer;
 
-        /// <summary>
-        /// Singleton management of the audio controls.
-        /// </summary>
-        public static AudioControl Instance
-        {
-            get 
-            {
-                if (instance == null)
-                {
-                    instance = new AudioControl();
-                }
-                return instance;
+        public DefaultLoopAudioPlayer(UnmanagedMemoryStream stream) {
+            this.Stream = stream;
+            this.Start();
+        }
+
+        private void Start() {
+            this.Stream.Position = 0;
+            this.SoundPlayer = new SoundPlayer(this.Stream);
+            //this.SoundPlayer.LoadCompleted += (s, e) => MessageBox.Show("LoadCompleted");
+            //this.SoundPlayer.SoundLocationChanged += (s, e) => MessageBox.Show("SoundLocationChanged");
+            //this.SoundPlayer.StreamChanged += (s, e) => MessageBox.Show("StreamChanged");
+            //this.SoundPlayer.Disposed += (s, e) => MessageBox.Show("Disposed");
+            this.SoundPlayer.PlayLooping();
+        }
+
+        private void Stop() {
+            if (this.SoundPlayer != null) {
+                this.SoundPlayer.Stop();
+                this.SoundPlayer.Dispose();
+                this.SoundPlayer = null;
             }
         }
 
-        ~AudioControl()
-        {
-            //Dispose(false);
+        public void TryDispose() {
+            try {
+                this.Dispose();
+            }
+            catch {
+                //Do nothing.
+            }
         }
 
-        //public void Dispose()
-        //{
-        //    Dispose(true);
-        //    GC.SuppressFinalize(this);
-        //}
+        public void Dispose() {
+            this.Stop();
+        }
+    }
 
-        //private void Dispose(bool p)
-        //{
-        //    this.sound.Dispose();
-        //}
+    class WaveOutLoopAudioPlayer : ILoopAudioPlayer {
+        private WaveOut SoundPlayer;
+        private bool IsIdisposed = false;
+        private readonly UnmanagedMemoryStream Stream;
+        private readonly int DeviceId;
+
+        public WaveOutLoopAudioPlayer(UnmanagedMemoryStream stream, int deviceId) {
+            this.Stream = stream;
+            this.DeviceId = deviceId;
+            this.Start();
+        }
+
+        private void Start() {
+            this.Stream.Position = 0;
+            var reader = new WaveFileReader(this.Stream);
+            var loop = new LoopStream(reader);
+            this.SoundPlayer = new WaveOut { DeviceNumber = this.DeviceId };
+            this.SoundPlayer.PlaybackStopped += this.SoundPlayer_PlaybackStopped;
+            this.SoundPlayer.Init(loop);
+            this.SoundPlayer.Play();
+        }
+
+        private void Stop() {
+            if (this.SoundPlayer != null) {
+                this.SoundPlayer.PlaybackStopped -= this.SoundPlayer_PlaybackStopped;
+                this.SoundPlayer.Stop();
+                this.SoundPlayer.Dispose();
+                this.SoundPlayer = null;
+            }
+        }
+
+        private void SoundPlayer_PlaybackStopped(object sender, StoppedEventArgs e) {
+            if (!this.IsIdisposed) {
+                try {
+                    this.Stop();
+                }
+                catch {
+                    //Do nothing
+                }
+                this.Start();
+            }
+        }
+
+        public void TryDispose() {
+            try {
+                this.Dispose();
+            }
+            catch {
+                //Do nothing.
+            }
+        }
+
+        public void Dispose() {
+            this.IsIdisposed = true;
+            this.Stop();
+        }
+    }
+
+    class AudioControl {
+        public static readonly Lazy<AudioControl> Instance = new Lazy<AudioControl>(() => new AudioControl());
+        private static readonly UserPreferences UserPerfs = new UserPreferences();
+
+        public bool IsRunning { get; private set; }
+        private List<ILoopAudioPlayer> AudioPlayers = new List<ILoopAudioPlayer>();
+        private UnmanagedMemoryStream Sound;
 
         /// <summary>
         /// Start the audio playback which will keep the SPDIF link alive.
         /// </summary>
-        public void start()
-        {
+        public void Start() {
             UserPerfs.Load(); //Reload preferences to make sure the latest sound type is applied.
-            if (UserPerfs.SoundType == UserPreferences.Sound.Inaudible)
-            {
-                sound_type = Properties.Resources.inaudible;
+            foreach (var player in this.AudioPlayers) {
+                player.TryDispose();
             }
-            else if (UserPerfs.SoundType == UserPreferences.Sound.Silent)
-            {
-                sound_type = Properties.Resources.blank;
-            }
-            else
-            {
-                sound_type = Properties.Resources.inaudible;
+            switch (UserPerfs.SoundType) {
+                case UserPreferences.Sound.Silent:
+                    this.Sound = Properties.Resources.blank;
+                    var players = PlaySoundAsync(Properties.Resources.inaudible);
+                    this.AudioPlayers = PlaySoundAsync(this.Sound);
+                    foreach (var p in players) {
+                        p.TryDispose();
+                    }
+                    break;
+                case UserPreferences.Sound.Inaudible:
+                default:
+                    this.Sound = Properties.Resources.inaudible;
+                    this.AudioPlayers = PlaySoundAsync(this.Sound);
+                    break;
             }
 
-            sound = new SoundPlayer(sound_type);
-            sound.LoadCompleted += new AsyncCompletedEventHandler(wavPlayer_LoadCompleted);
-            sound.LoadAsync();
+            this.IsRunning = true;
         }
-        
+
+        private static List<ILoopAudioPlayer> PlaySoundAsync(UnmanagedMemoryStream sound) {
+            var players = new List<ILoopAudioPlayer>(UserPerfs.EnabledDeviceNames.Count);
+            foreach (var deviceName in UserPerfs.EnabledDeviceNames) {
+                try {
+                    if (deviceName == UserPreferences.DEFAULT_AUDIO_DEVICE) {
+                        players.Add(new DefaultLoopAudioPlayer(sound));
+                    }
+                    else {
+                        //Try using NAudio.Wave.SilenceProvider instead of file to generate silence.
+                        if (WaveOut.DeviceCount <= 0) return players;
+                        for (var deviceId = -1; deviceId < WaveOut.DeviceCount; deviceId++) {
+                            var capabilities = WaveOut.GetCapabilities(deviceId);
+                            if (capabilities.ProductName == deviceName) {
+                                players.Add(new WaveOutLoopAudioPlayer(sound, deviceId: deviceId));
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex) {
+                    MessageBox.Show("Error: " + ex);
+                    // Do nothing
+                }
+            }
+            return players;
+        }
+
         /// <summary>
         /// Stop the audio playback which will stop the SPDIF link.
         /// </summary>
-        public void stop()
-        {
-            //Make sure we don't try to call Stop on a null object.
-            if(this.sound != null)
-            {
-                this.sound.Stop();
-                sound.Dispose();
-                sound = null;
+        public void Stop() {
+            foreach (var player in this.AudioPlayers) {
+                player.TryDispose();
             }
-            isSoundStarted = false;
-        }
-
-        /// <summary>
-        /// Check to see the current state of the audio playback is either started or stopped.
-        /// </summary>
-        /// <returns></returns>
-        public Boolean isRunning()
-        {
-            return isSoundStarted;
-        }
-
-
-        /// <summary>
-        /// Async WAV file event loading and begin playback.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void wavPlayer_LoadCompleted(object sender, AsyncCompletedEventArgs e)
-        {
-            isSoundStarted = true;
-            ((System.Media.SoundPlayer)sender).PlayLooping();
+            this.AudioPlayers.Clear();
+            this.IsRunning = false;
         }
     }
 }
