@@ -28,3 +28,9 @@ _ReSharper*/
 *.vssscc
 $tf*/
 /SPDIFKA/publish
+.vs/
+[Tt]humbs.db
+[Bb]uild[Ll]og.*
+*.[Pp]ublish.xml
+*.resharper
+packages/

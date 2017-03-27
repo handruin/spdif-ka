@@ -32,6 +32,7 @@ namespace SPDIFKA {
         public void Load() {
             this.IsHidden = Properties.Settings.Default.IsHidden;
             this.IsRunning = Properties.Settings.Default.IsRunning;
+            this.IsStartWithWindows = Properties.Settings.Default.IsStartWithWindows;
             if (Properties.Settings.Default.SoundType == "Silent") {
                 this.SoundType = Sound.Silent;
             }

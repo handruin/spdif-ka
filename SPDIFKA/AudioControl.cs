@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
-using System.Media;
 using System.Windows.Forms;
 using NAudio.Wave;
 using SPDIFKA.Lib;
@@ -12,50 +10,9 @@ namespace SPDIFKA {
         void TryDispose();
     }
 
-    class DefaultLoopAudioPlayer : ILoopAudioPlayer {
-        private readonly UnmanagedMemoryStream Stream;
-        private SoundPlayer SoundPlayer;
-
-        public DefaultLoopAudioPlayer(UnmanagedMemoryStream stream) {
-            this.Stream = stream;
-            this.Start();
-        }
-
-        private void Start() {
-            this.Stream.Position = 0;
-            this.SoundPlayer = new SoundPlayer(this.Stream);
-            //this.SoundPlayer.LoadCompleted += (s, e) => MessageBox.Show("LoadCompleted");
-            //this.SoundPlayer.SoundLocationChanged += (s, e) => MessageBox.Show("SoundLocationChanged");
-            //this.SoundPlayer.StreamChanged += (s, e) => MessageBox.Show("StreamChanged");
-            //this.SoundPlayer.Disposed += (s, e) => MessageBox.Show("Disposed");
-            this.SoundPlayer.PlayLooping();
-        }
-
-        private void Stop() {
-            if (this.SoundPlayer != null) {
-                this.SoundPlayer.Stop();
-                this.SoundPlayer.Dispose();
-                this.SoundPlayer = null;
-            }
-        }
-
-        public void TryDispose() {
-            try {
-                this.Dispose();
-            }
-            catch {
-                //Do nothing.
-            }
-        }
-
-        public void Dispose() {
-            this.Stop();
-        }
-    }
-
     class WaveOutLoopAudioPlayer : ILoopAudioPlayer {
         private WaveOut SoundPlayer;
-        private bool IsIdisposed = false;
+        private bool IsIdisposed;
         private readonly UnmanagedMemoryStream Stream;
         private readonly int DeviceId;
 
@@ -132,8 +89,15 @@ namespace SPDIFKA {
                     this.Sound = Properties.Resources.blank;
                     var players = PlaySoundAsync(Properties.Resources.inaudible);
                     this.AudioPlayers = PlaySoundAsync(this.Sound);
-                    foreach (var p in players) {
-                        p.TryDispose();
+                    if (players.Count != 0 && this.AudioPlayers.Count != 0) {
+                        var timer = new Timer { Interval = 2000 };
+                        timer.Tick += (sender, e) => {
+                            foreach (var p in players) {
+                                p.TryDispose();
+                            }
+                            timer.Dispose();
+                        };
+                        timer.Start();
                     }
                     break;
                 case UserPreferences.Sound.Inaudible:
@@ -147,25 +111,28 @@ namespace SPDIFKA {
         }
 
         private static List<ILoopAudioPlayer> PlaySoundAsync(UnmanagedMemoryStream sound) {
-            var players = new List<ILoopAudioPlayer>(UserPerfs.EnabledDeviceNames.Count);
+            var deviceIds = new HashSet<int>();
             foreach (var deviceName in UserPerfs.EnabledDeviceNames) {
-                try {
-                    if (deviceName == UserPreferences.DEFAULT_AUDIO_DEVICE) {
-                        players.Add(new DefaultLoopAudioPlayer(sound));
-                    }
-                    else {
-                        //Try using NAudio.Wave.SilenceProvider instead of file to generate silence.
-                        if (WaveOut.DeviceCount <= 0) return players;
-                        for (var deviceId = -1; deviceId < WaveOut.DeviceCount; deviceId++) {
-                            var capabilities = WaveOut.GetCapabilities(deviceId);
-                            if (capabilities.ProductName == deviceName) {
-                                players.Add(new WaveOutLoopAudioPlayer(sound, deviceId: deviceId));
-                            }
+                if (deviceName == UserPreferences.DEFAULT_AUDIO_DEVICE) {
+                    deviceIds.Add(-1);
+                }
+                else {
+                    if (WaveOut.DeviceCount <= 0) continue;
+                    for (var deviceId = -1; deviceId < WaveOut.DeviceCount; deviceId++) {
+                        var capabilities = WaveOut.GetCapabilities(deviceId);
+                        if (capabilities.ProductName == deviceName) {
+                            deviceIds.Add(deviceId);
                         }
                     }
                 }
+            }
+            var players = new List<ILoopAudioPlayer>(deviceIds.Count);
+            foreach (var deviceId in deviceIds) {
+                try {
+                    players.Add(new WaveOutLoopAudioPlayer(sound, deviceId: deviceId));
+                }
                 catch (Exception ex) {
-                    MessageBox.Show("Error: " + ex);
+                    //MessageBox.Show("Error: " + ex);
                     // Do nothing
                 }
             }
