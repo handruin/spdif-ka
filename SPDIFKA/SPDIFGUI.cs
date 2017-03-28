@@ -1,12 +1,18 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using NAudio.Wave;
 using SPDIFKA.Lib;
+using NAudio.CoreAudioApi;
+using NAudio.CoreAudioApi.Interfaces;
+using NLog;
 
 namespace SPDIFKA {
-    public partial class SPDIFKAGUI : Form {
+    public partial class SPDIFKAGUI : Form, IMMNotificationClient {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private const string AppName = "SPDIF-KA";
         private const string StoppedMessage = "stopped";
         private const string RunningMessage = "running";
@@ -14,7 +20,8 @@ namespace SPDIFKA {
         private static string ToolStripStopText = "Stop " + AppName;
         private const string UNPLUGGED_SUFFIX = " (*Unplugged*)";
         private bool IsAppVisible = true;
-        private bool IsAnyTargetedDevicesUnplugged;
+        private bool IsAnyTargetedDeviceUnplugged;
+        private bool IsRegisteredToAudioDeviceNotifications;
 
         private static readonly string Version = System.Reflection.Assembly.GetExecutingAssembly()
                                            .GetName()
@@ -90,67 +97,114 @@ namespace SPDIFKA {
                 this.ToggleStartStop();
             }
             this.ReloadDevices();
-            this.RegisterOrUnregisterUsbDeviceNotificationBasedOnEnabledDevices();
+            if (this.ShouldRegisterToAudioDeviceNotifications()) {
+                this.RegisterToAudioDeviceNotifications();
+            }
             SystemEvents.PowerModeChanged += this.OnPowerChange;
         }
 
-        private void OnPowerChange(object s, PowerModeChangedEventArgs e) {
-            switch (e.Mode) {
-                case PowerModes.Resume:
-                    this.ReloadDevices();
-                    this.RestartAudioControlIfRunning();
-                    if (this.IsAnyTargetedDevicesUnplugged) {
-                        var timer = new Timer { Interval = 5000 };
-                        timer.Tick += (s2, e2) => {
-                            this.ReloadDevices();
-                            this.RestartAudioControlIfRunning();
-                            timer.Dispose();
-                        };
-                        timer.Start();
-                    }
-                    break;
-                case PowerModes.Suspend:
-                    break;
-            }
-        }
-
-        private bool IsRegisteredToUsbDeviceNotification = false;
-        private void RegisterOrUnregisterUsbDeviceNotificationBasedOnEnabledDevices() {
+        private bool ShouldRegisterToAudioDeviceNotifications() {
             foreach (var deviceName in UserPrefs.TargetedDeviceNames) {
                 if (deviceName != UserPreferences.DEFAULT_AUDIO_DEVICE) {
-                    if (!this.IsRegisteredToUsbDeviceNotification) {
-                        this.IsRegisteredToUsbDeviceNotification = true;
-                        UsbNotification.RegisterUsbDeviceNotification(this.Handle);
-                    }
-                    return;
+                    return true;
                 }
             }
-            if (this.IsRegisteredToUsbDeviceNotification) {
-                this.IsRegisteredToUsbDeviceNotification = false;
-                UsbNotification.UnregisterUsbDeviceNotification();
+            return false;
+        }
+
+        private MMDeviceEnumerator MMDeviceEnumerator;
+        private void RegisterToAudioDeviceNotifications() {
+            if (this.IsRegisteredToAudioDeviceNotifications) return;
+            this.IsRegisteredToAudioDeviceNotifications = true;
+            //DeviceNotification.RegisterDeviceNotification(this.Handle);
+
+            // Credit: http://stackoverflow.com/a/33945287/541420
+            this.MMDeviceEnumerator = new MMDeviceEnumerator();
+            var endpoints = this.MMDeviceEnumerator.EnumerateAudioEndPoints(DataFlow.Render, DeviceState.Active);
+            foreach (var endpoint in endpoints) {
+                Logger.Trace($"{endpoint.State} > {endpoint.DeviceFriendlyName} [{endpoint.ID}]");
             }
+            this.MMDeviceEnumerator.RegisterEndpointNotificationCallback(this);
+        }
+
+        private void UnregisterFromAudioDeviceNotifications() {
+            if (!this.IsRegisteredToAudioDeviceNotifications) return;
+            this.IsRegisteredToAudioDeviceNotifications = false;
+            //DeviceNotification.UnregisterDeviceNotification();
+
+            this.MMDeviceEnumerator.UnregisterEndpointNotificationCallback(this);
+            this.MMDeviceEnumerator.Dispose();
+        }
+
+        void IMMNotificationClient.OnDeviceStateChanged(string deviceId, DeviceState newState) {
+            Logger.Trace("OnDeviceStateChanged [{0}] : {1}", deviceId, newState);
+            this.InvokeOnDeviceChangedAsync();
+        }
+
+        void IMMNotificationClient.OnDeviceAdded(string pwstrDeviceId) {
+            Logger.Trace("OnDeviceAdded [{0}]", pwstrDeviceId);
+            this.InvokeOnDeviceChangedAsync();
+
+        }
+
+        void IMMNotificationClient.OnDeviceRemoved(string deviceId) {
+            Logger.Trace("OnDeviceRemoved [{0}]", deviceId);
+            this.InvokeOnDeviceChangedAsync();
+        }
+
+        void IMMNotificationClient.OnDefaultDeviceChanged(DataFlow flow, Role role, string defaultDeviceId) { }
+        void IMMNotificationClient.OnPropertyValueChanged(string pwstrDeviceId, PropertyKey key) { }
+
+        void InvokeOnDeviceChangedAsync() {
+            Task.Run(() => {
+                this.Invoke((MethodInvoker)(() => {
+                    this.OnDeviceChanged();
+                }));
+            });
+        }
+        void OnDeviceChanged() {
+            this.ReloadDevices();
+            this.RestartAudioControlIfRunning();
+        }
+
+        private void OnPowerChange(object s, PowerModeChangedEventArgs e) {
+            if (e.Mode != PowerModes.Resume) return;
+            Task.Run(() => {
+                this.Invoke((MethodInvoker)(() => {
+                    this.OnDeviceChanged();
+                    if (!this.IsAnyTargetedDeviceUnplugged) return;
+                    var timer = new Timer { Interval = 5000 };
+                    timer.Tick += (s2, e2) => {
+                        this.OnDeviceChanged();
+                        timer.Dispose();
+                    };
+                    timer.Start();
+                }));
+            });
         }
 
         protected override void WndProc(ref Message m) {
             base.WndProc(ref m);
-            if (m.Msg == UsbNotification.WmDevicechange) {
-                switch ((int)m.WParam) {
-                    case UsbNotification.DbtDeviceremovecomplete:
-                        this.ReloadDevices();
-                        this.RestartAudioControlIfRunning();
-                        break;
-                    case UsbNotification.DbtDevicearrival:
-                        this.ReloadDevices();
-                        this.RestartAudioControlIfRunning();
-                        break;
-                }
+            switch (m.Msg) {
+                case DeviceNotification.WmDevicechange:
+                    switch ((int)m.WParam) {
+                        case DeviceNotification.DbtDeviceRemoveComplete:
+                        case DeviceNotification.DbtDeviceArrival:
+                        case DeviceNotification.DbtDevNodesChanged:
+                            this.InvokeOnDeviceChangedAsync();
+                            break;
+                    }
+                    break;
+                    //case UsbNotification.WmDisplayChange:
+                    //    this.InvokeOnDeviceChangedAsync();
+                    //    break;
             }
         }
 
         private void ReloadDevices() {
             this.comboBoxWaveOutDevice.Items.Clear();
             this.comboBoxWaveOutDevice.Items.Add(UserPreferences.DEFAULT_AUDIO_DEVICE);
-            this.IsAnyTargetedDevicesUnplugged = false;
+            this.IsAnyTargetedDeviceUnplugged = false;
             for (var deviceId = -1; deviceId < WaveOut.DeviceCount; deviceId++) {
                 var capabilities = WaveOut.GetCapabilities(deviceId);
                 this.comboBoxWaveOutDevice.Items.Add(capabilities.ProductName);
@@ -165,7 +219,8 @@ namespace SPDIFKA {
                 }
                 if (!plugged) {
                     this.comboBoxWaveOutDevice.Items.Add(deviceName + UNPLUGGED_SUFFIX);
-                    this.IsAnyTargetedDevicesUnplugged = true;
+                    this.comboBoxWaveOutDevice.SetItemChecked(this.comboBoxWaveOutDevice.Items.Count - 1, true);
+                    this.IsAnyTargetedDeviceUnplugged = true;
                 }
             }
         }
@@ -201,13 +256,12 @@ namespace SPDIFKA {
         /// Minimize the application into the task bar.
         /// </summary>
         private void Minimize() {
-
             this.spdifka.Visible = true;
-            this.minimized_to_notificaton_area();
+            this.MinimizeToNotificationArea();
 
         }
 
-        private void minimized_to_notificaton_area() {
+        private void MinimizeToNotificationArea() {
             if (UserPrefs.IsMinimizeToNotificationArea) {
                 this.IsAppVisible = false;
                 this.ShowInTaskbar = false;
@@ -215,8 +269,8 @@ namespace SPDIFKA {
             }
             else {
                 this.IsAppVisible = true;
-                this.WindowState = FormWindowState.Minimized;
                 this.ShowInTaskbar = true;
+                this.WindowState = FormWindowState.Minimized;
             }
         }
 
@@ -225,8 +279,8 @@ namespace SPDIFKA {
         /// </summary>
         private void Restore() {
             this.IsAppVisible = true;
-            this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
+            this.WindowState = FormWindowState.Normal;
             this.Show();
             this.Activate();
         }
@@ -258,7 +312,7 @@ namespace SPDIFKA {
         /// <param name="e"></param>
         private void toolStripExit_Click(object sender, EventArgs e) {
             AudioControl.Instance.Value.Stop();  //Ensure audio stops before exiting.
-            this.Exit_application();
+            this.ExitApplication();
         }
 
         private void SPDIFKAGUI_FormClosing(object sender, FormClosingEventArgs e) {
@@ -268,12 +322,12 @@ namespace SPDIFKA {
                     e.Cancel = true;
                 }
                 else {
-                    this.Exit_application();
+                    this.ExitApplication();
                 }
             }
         }
 
-        private void Exit_application() {
+        private void ExitApplication() {
             this.spdifka.Icon = null;  //Ensure tray icon does not persist after close.
             Application.Exit();
         }
@@ -418,7 +472,7 @@ namespace SPDIFKA {
                 UserPrefs.Save();
             }
             UserPrefs.TargetedDeviceNames.Clear();
-            for (int i = 0; i < this.comboBoxWaveOutDevice.Items.Count; i++) {
+            for (var i = 0; i < this.comboBoxWaveOutDevice.Items.Count; i++) {
                 var deviceName = this.comboBoxWaveOutDevice.Items[i].ToString().Replace(UNPLUGGED_SUFFIX, "");
                 if (this.comboBoxWaveOutDevice.GetItemChecked(i)) {
                     if (!UserPrefs.TargetedDeviceNames.Contains(deviceName)) {
@@ -430,13 +484,17 @@ namespace SPDIFKA {
                 }
             }
             UserPrefs.Save();
-            this.RegisterOrUnregisterUsbDeviceNotificationBasedOnEnabledDevices();
+            if (this.ShouldRegisterToAudioDeviceNotifications()) {
+                this.RegisterToAudioDeviceNotifications();
+            }
+            else {
+                this.UnregisterFromAudioDeviceNotifications();
+            }
             this.RestartAudioControlIfRunning();
         }
 
         private void TabsMenu1_Click(object sender, EventArgs e) {
-            this.ReloadDevices();
-            this.RestartAudioControlIfRunning();
+            this.OnDeviceChanged();
         }
     }
 }
