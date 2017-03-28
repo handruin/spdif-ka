@@ -81,36 +81,36 @@
             this.toolStripSeparator2,
             this.toolStripExit});
             this.RightClickMenuStrip.Name = "contextMenuStrip1";
-            this.RightClickMenuStrip.Size = new System.Drawing.Size(186, 130);
+            this.RightClickMenuStrip.Size = new System.Drawing.Size(161, 124);
             // 
             // toolStripStart
             // 
             this.toolStripStart.Name = "toolStripStart";
-            this.toolStripStart.Size = new System.Drawing.Size(185, 38);
+            this.toolStripStart.Size = new System.Drawing.Size(160, 36);
             this.toolStripStart.Text = "[temp]";
             this.toolStripStart.Click += new System.EventHandler(this.toolStripStart_Click);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(182, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(157, 6);
             // 
             // toolStripAbout
             // 
             this.toolStripAbout.Name = "toolStripAbout";
-            this.toolStripAbout.Size = new System.Drawing.Size(185, 38);
+            this.toolStripAbout.Size = new System.Drawing.Size(160, 36);
             this.toolStripAbout.Text = "About";
             this.toolStripAbout.Click += new System.EventHandler(this.toolStripAbout_Click);
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(182, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(157, 6);
             // 
             // toolStripExit
             // 
             this.toolStripExit.Name = "toolStripExit";
-            this.toolStripExit.Size = new System.Drawing.Size(185, 38);
+            this.toolStripExit.Size = new System.Drawing.Size(160, 36);
             this.toolStripExit.Text = "Exit";
             this.toolStripExit.Click += new System.EventHandler(this.toolStripExit_Click);
             // 
@@ -127,6 +127,7 @@
             this.TabsMenu1.SelectedIndex = 0;
             this.TabsMenu1.Size = new System.Drawing.Size(582, 287);
             this.TabsMenu1.TabIndex = 3;
+            this.TabsMenu1.Click += new System.EventHandler(this.TabsMenu1_Click);
             // 
             // MainPage
             // 

@@ -11,7 +11,7 @@ namespace SPDIFKA {
         public bool IsMinimizeToNotificationArea { get; set; }
         public bool IsMinimizedOnClose { get; set; }
         public Sound SoundType { get; set; }
-        public StringCollection EnabledDeviceNames { get; set; }
+        public StringCollection TargetedDeviceNames { get; set; }
 
         public UserPreferences() {
             this.Load();
@@ -24,7 +24,7 @@ namespace SPDIFKA {
             Properties.Settings.Default.IsMinimizedNotification = this.IsMinimizeToNotificationArea;
             Properties.Settings.Default.IsMinimizedOnClose = this.IsMinimizedOnClose;
             Properties.Settings.Default.SoundType = this.SoundType.ToString();
-            Properties.Settings.Default.EnabledDeviceNames = this.EnabledDeviceNames;
+            Properties.Settings.Default.TargetedDeviceNames = this.TargetedDeviceNames;
             Properties.Settings.Default.Save();
         }
 
@@ -41,7 +41,7 @@ namespace SPDIFKA {
             if (Properties.Settings.Default.SoundType == "Inaudible") {
                 this.SoundType = Sound.Inaudible;
             }
-            this.EnabledDeviceNames = Properties.Settings.Default.EnabledDeviceNames ?? new StringCollection { DEFAULT_AUDIO_DEVICE };
+            this.TargetedDeviceNames = Properties.Settings.Default.TargetedDeviceNames ?? new StringCollection { DEFAULT_AUDIO_DEVICE };
         }
     }
 }

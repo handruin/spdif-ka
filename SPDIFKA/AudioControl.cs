@@ -111,7 +111,7 @@ namespace SPDIFKA {
 
         private static List<ILoopAudioPlayer> PlaySoundAsync(UnmanagedMemoryStream sound) {
             var deviceIds = new HashSet<int>();
-            foreach (var deviceName in SPDIFKAGUI.UserPrefs.EnabledDeviceNames) {
+            foreach (var deviceName in SPDIFKAGUI.UserPrefs.TargetedDeviceNames) {
                 if (deviceName == UserPreferences.DEFAULT_AUDIO_DEVICE) {
                     deviceIds.Add(-1);
                 }

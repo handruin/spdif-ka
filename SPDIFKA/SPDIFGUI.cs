@@ -7,15 +7,16 @@ using SPDIFKA.Lib;
 
 namespace SPDIFKA {
     public partial class SPDIFKAGUI : Form {
-        private const string name = "SPDIF-KA";
-        private const string stoppedMessage = "stopped";
-        private const string startMessage = "running";
-        private static string toolStripStartText = "Start " + name;
-        private static string toolStripStopText = "Stop " + name;
+        private const string AppName = "SPDIF-KA";
+        private const string StoppedMessage = "stopped";
+        private const string RunningMessage = "running";
+        private static string ToolStripStartText = "Start " + AppName;
+        private static string ToolStripStopText = "Stop " + AppName;
         private const string UNPLUGGED_SUFFIX = " (*Unplugged*)";
-        private bool isAppVisible = true;
+        private bool IsAppVisible = true;
+        private bool IsAnyTargetedDevicesUnplugged;
 
-        private static readonly string version = System.Reflection.Assembly.GetExecutingAssembly()
+        private static readonly string Version = System.Reflection.Assembly.GetExecutingAssembly()
                                            .GetName()
                                            .Version
                                            .ToString();
@@ -43,15 +44,15 @@ namespace SPDIFKA {
             this.MaximizeBox = false;
 
             this.spdifka.BalloonTipIcon = ToolTipIcon.Info;
-            this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
-            this.spdifka.BalloonTipTitle = name;
-            this.spdifka.Text = name + " - " + stoppedMessage;
+            this.spdifka.BalloonTipText = AppName + " - " + StoppedMessage;
+            this.spdifka.BalloonTipTitle = AppName;
+            this.spdifka.Text = AppName + " - " + StoppedMessage;
             this.spdifka.Icon = Properties.Resources.bar_chart_64_red;
 
-            this.toolStripStart.Text = toolStripStartText;
+            this.toolStripStart.Text = ToolStripStartText;
             this.spdifka.ContextMenuStrip = this.RightClickMenuStrip;
             this.Resize += this.Form1_Resize;
-            this.runningLabel.Text = stoppedMessage;
+            this.runningLabel.Text = StoppedMessage;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.LoadState();
             this.IsInitializing = false;
@@ -63,7 +64,7 @@ namespace SPDIFKA {
         /// </summary>
         /// <param name="isVisible"></param>
         protected override void SetVisibleCore(bool isVisible) {
-            if (!this.isAppVisible) {
+            if (!this.IsAppVisible) {
                 isVisible = false;
                 if (!this.IsHandleCreated) this.CreateHandle();
             }
@@ -98,6 +99,15 @@ namespace SPDIFKA {
                 case PowerModes.Resume:
                     this.ReloadDevices();
                     this.RestartAudioControlIfRunning();
+                    if (this.IsAnyTargetedDevicesUnplugged) {
+                        var timer = new Timer { Interval = 5000 };
+                        timer.Tick += (s2, e2) => {
+                            this.ReloadDevices();
+                            this.RestartAudioControlIfRunning();
+                            timer.Dispose();
+                        };
+                        timer.Start();
+                    }
                     break;
                 case PowerModes.Suspend:
                     break;
@@ -106,7 +116,7 @@ namespace SPDIFKA {
 
         private bool IsRegisteredToUsbDeviceNotification = false;
         private void RegisterOrUnregisterUsbDeviceNotificationBasedOnEnabledDevices() {
-            foreach (var deviceName in UserPrefs.EnabledDeviceNames) {
+            foreach (var deviceName in UserPrefs.TargetedDeviceNames) {
                 if (deviceName != UserPreferences.DEFAULT_AUDIO_DEVICE) {
                     if (!this.IsRegisteredToUsbDeviceNotification) {
                         this.IsRegisteredToUsbDeviceNotification = true;
@@ -138,22 +148,25 @@ namespace SPDIFKA {
         }
 
         private void ReloadDevices() {
-            if (WaveOut.DeviceCount <= 0) return;
             this.comboBoxWaveOutDevice.Items.Clear();
             this.comboBoxWaveOutDevice.Items.Add(UserPreferences.DEFAULT_AUDIO_DEVICE);
+            this.IsAnyTargetedDevicesUnplugged = false;
             for (var deviceId = -1; deviceId < WaveOut.DeviceCount; deviceId++) {
                 var capabilities = WaveOut.GetCapabilities(deviceId);
                 this.comboBoxWaveOutDevice.Items.Add(capabilities.ProductName);
             }
-            foreach (var deviceName in UserPrefs.EnabledDeviceNames) {
-                var found = false;
-                for (int i = 0; i < this.comboBoxWaveOutDevice.Items.Count; i++) {
+            foreach (var deviceName in UserPrefs.TargetedDeviceNames) {
+                var plugged = false;
+                for (var i = 0; i < this.comboBoxWaveOutDevice.Items.Count; i++) {
                     if (this.comboBoxWaveOutDevice.Items[i].ToString().Replace(UNPLUGGED_SUFFIX, "") == deviceName) {
                         this.comboBoxWaveOutDevice.SetItemChecked(i, true);
-                        found = true;
+                        plugged = true;
                     }
                 }
-                if (!found) this.comboBoxWaveOutDevice.Items.Add(deviceName + UNPLUGGED_SUFFIX);
+                if (!plugged) {
+                    this.comboBoxWaveOutDevice.Items.Add(deviceName + UNPLUGGED_SUFFIX);
+                    this.IsAnyTargetedDevicesUnplugged = true;
+                }
             }
         }
 
@@ -196,12 +209,12 @@ namespace SPDIFKA {
 
         private void minimized_to_notificaton_area() {
             if (UserPrefs.IsMinimizeToNotificationArea) {
-                this.isAppVisible = false;
+                this.IsAppVisible = false;
                 this.ShowInTaskbar = false;
                 this.Hide();
             }
             else {
-                this.isAppVisible = true;
+                this.IsAppVisible = true;
                 this.WindowState = FormWindowState.Minimized;
                 this.ShowInTaskbar = true;
             }
@@ -211,7 +224,7 @@ namespace SPDIFKA {
         /// Restore the window to normal user operation mode.
         /// </summary>
         private void Restore() {
-            this.isAppVisible = true;
+            this.IsAppVisible = true;
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
             this.Show();
@@ -271,7 +284,7 @@ namespace SPDIFKA {
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void toolStripAbout_Click(object sender, EventArgs e) {
-            MessageBox.Show("Copyright 2017 handruin.com - Version " + version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            MessageBox.Show("Copyright 2017 handruin.com - Version " + Version, "About", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         /// <summary>
@@ -279,25 +292,25 @@ namespace SPDIFKA {
         /// </summary>
         private void ToggleStartStop() {
             if (!AudioControl.Instance.Value.IsRunning) {
-                this.spdifka.Text = name + " - " + startMessage;
-                this.toolStripStart.Text = toolStripStopText;
-                this.runningLabel.Text = startMessage;
-                this.spdifka.BalloonTipText = name + " - " + startMessage;
+                this.spdifka.Text = AppName + " - " + RunningMessage;
+                this.toolStripStart.Text = ToolStripStopText;
+                this.runningLabel.Text = RunningMessage;
+                this.spdifka.BalloonTipText = AppName + " - " + RunningMessage;
                 this.startStopButton.Text = "Stop";
                 AudioControl.Instance.Value.Start();
                 this.UpdateTrayIconWhenRunning(isRunning: true);
             }
             else {
-                this.spdifka.Text = name + " - " + stoppedMessage;
+                this.spdifka.Text = AppName + " - " + StoppedMessage;
                 this.startStopButton.Text = "Start";
-                this.toolStripStart.Text = toolStripStartText;
-                this.runningLabel.Text = stoppedMessage;
-                this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
+                this.toolStripStart.Text = ToolStripStartText;
+                this.runningLabel.Text = StoppedMessage;
+                this.spdifka.BalloonTipText = AppName + " - " + StoppedMessage;
                 AudioControl.Instance.Value.Stop();
                 this.UpdateTrayIconWhenRunning(isRunning: false);
             }
-        }      
-        
+        }
+
         /// <summary>
         /// Restart the audio control only if the audio was already running.
         /// </summary>
@@ -400,24 +413,29 @@ namespace SPDIFKA {
 
         private void comboBoxWaveOutDevice_SelectedIndexChanged(object sender, EventArgs e) {
             if (this.IsInitializing) return;
-            if (UserPrefs.EnabledDeviceNames == null) {
-                UserPrefs.EnabledDeviceNames = Properties.Settings.Default.EnabledDeviceNames;
+            if (UserPrefs.TargetedDeviceNames == null) {
+                UserPrefs.TargetedDeviceNames = Properties.Settings.Default.TargetedDeviceNames;
                 UserPrefs.Save();
             }
-            UserPrefs.EnabledDeviceNames.Clear();
+            UserPrefs.TargetedDeviceNames.Clear();
             for (int i = 0; i < this.comboBoxWaveOutDevice.Items.Count; i++) {
                 var deviceName = this.comboBoxWaveOutDevice.Items[i].ToString().Replace(UNPLUGGED_SUFFIX, "");
                 if (this.comboBoxWaveOutDevice.GetItemChecked(i)) {
-                    if (!UserPrefs.EnabledDeviceNames.Contains(deviceName)) {
-                        UserPrefs.EnabledDeviceNames.Add(deviceName);
+                    if (!UserPrefs.TargetedDeviceNames.Contains(deviceName)) {
+                        UserPrefs.TargetedDeviceNames.Add(deviceName);
                     }
                 }
                 else {
-                    UserPrefs.EnabledDeviceNames.Remove(deviceName);
+                    UserPrefs.TargetedDeviceNames.Remove(deviceName);
                 }
             }
             UserPrefs.Save();
             this.RegisterOrUnregisterUsbDeviceNotificationBasedOnEnabledDevices();
+            this.RestartAudioControlIfRunning();
+        }
+
+        private void TabsMenu1_Click(object sender, EventArgs e) {
+            this.ReloadDevices();
             this.RestartAudioControlIfRunning();
         }
     }

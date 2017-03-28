@@ -147,7 +147,6 @@
   <ItemGroup>
     <Content Include="ILMergeOrder.txt" />
     <Content Include="media\blank.wav" />
-    <None Include="bar-chart-64-white.ico" />
     <None Include="media\inaudible.wav" />
     <Content Include="bar-chart-64-green.ico" />
   </ItemGroup>
