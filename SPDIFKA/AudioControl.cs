@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using NAudio.Wave;
+using NLog;
 using SPDIFKA.Lib;
 
 namespace SPDIFKA {
@@ -11,6 +12,8 @@ namespace SPDIFKA {
     }
 
     class WaveOutLoopAudioPlayer : ILoopAudioPlayer {
+        private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
         private WaveOut SoundPlayer;
         private bool IsIdisposed;
         private readonly UnmanagedMemoryStream Stream;
@@ -43,6 +46,7 @@ namespace SPDIFKA {
 
         private void SoundPlayer_PlaybackStopped(object sender, StoppedEventArgs e) {
             if (!this.IsIdisposed) {
+                Logger.Trace("SoundPlayer_PlaybackStopped");
                 try {
                     this.Stop();
                 }

@@ -97,19 +97,8 @@ namespace SPDIFKA {
                 this.ToggleStartStop();
             }
             this.ReloadDevices();
-            if (this.ShouldRegisterToAudioDeviceNotifications()) {
-                this.RegisterToAudioDeviceNotifications();
-            }
+            this.RegisterToAudioDeviceNotifications(); //Needed even for default playback device as otherwise it may stop playing.
             SystemEvents.PowerModeChanged += this.OnPowerChange;
-        }
-
-        private bool ShouldRegisterToAudioDeviceNotifications() {
-            foreach (var deviceName in UserPrefs.TargetedDeviceNames) {
-                if (deviceName != UserPreferences.DEFAULT_AUDIO_DEVICE) {
-                    return true;
-                }
-            }
-            return false;
         }
 
         private MMDeviceEnumerator MMDeviceEnumerator;
@@ -163,6 +152,7 @@ namespace SPDIFKA {
             });
         }
         void OnDeviceChanged() {
+            Logger.Trace("OnDeviceChanged");
             this.ReloadDevices();
             this.RestartAudioControlIfRunning();
         }
@@ -183,23 +173,24 @@ namespace SPDIFKA {
             });
         }
 
-        protected override void WndProc(ref Message m) {
-            base.WndProc(ref m);
-            switch (m.Msg) {
-                case DeviceNotification.WmDevicechange:
-                    switch ((int)m.WParam) {
-                        case DeviceNotification.DbtDeviceRemoveComplete:
-                        case DeviceNotification.DbtDeviceArrival:
-                        case DeviceNotification.DbtDevNodesChanged:
-                            this.InvokeOnDeviceChangedAsync();
-                            break;
-                    }
-                    break;
-                    //case UsbNotification.WmDisplayChange:
-                    //    this.InvokeOnDeviceChangedAsync();
-                    //    break;
-            }
-        }
+        //Would run even if we haven not called DeviceNotification.RegisterDeviceNotification(this.Handle);
+        //protected override void WndProc(ref Message m) {
+        //    base.WndProc(ref m);
+        //    switch (m.Msg) {
+        //        case DeviceNotification.WmDevicechange:
+        //            switch ((int)m.WParam) {
+        //                case DeviceNotification.DbtDeviceRemoveComplete:
+        //                case DeviceNotification.DbtDeviceArrival:
+        //                case DeviceNotification.DbtDevNodesChanged:
+        //                    this.InvokeOnDeviceChangedAsync();
+        //                    break;
+        //            }
+        //            break;
+        //            //case UsbNotification.WmDisplayChange:
+        //            //    this.InvokeOnDeviceChangedAsync();
+        //            //    break;
+        //    }
+        //}
 
         private void ReloadDevices() {
             this.comboBoxWaveOutDevice.Items.Clear();
@@ -370,6 +361,7 @@ namespace SPDIFKA {
         /// </summary>
         private void RestartAudioControlIfRunning() {
             if (AudioControl.Instance.Value.IsRunning) {
+                Logger.Trace("RestartAudioControl");
                 AudioControl.Instance.Value.Stop();
                 AudioControl.Instance.Value.Start();
             }
@@ -484,12 +476,6 @@ namespace SPDIFKA {
                 }
             }
             UserPrefs.Save();
-            if (this.ShouldRegisterToAudioDeviceNotifications()) {
-                this.RegisterToAudioDeviceNotifications();
-            }
-            else {
-                this.UnregisterFromAudioDeviceNotifications();
-            }
             this.RestartAudioControlIfRunning();
         }
 
