@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 using System.Windows.Forms;
 
 namespace SPDIFKA
@@ -29,7 +28,7 @@ namespace SPDIFKA
             this.Icon = Properties.Resources.bar_chart_64_red;
             this.MaximizeBox = false;
 
-            this.spdifka.BalloonTipIcon = System.Windows.Forms.ToolTipIcon.Info;
+            this.spdifka.BalloonTipIcon = ToolTipIcon.Info;
             this.spdifka.BalloonTipText = name + " - " + stoppedMessage;
             this.spdifka.BalloonTipTitle = name;
             this.spdifka.Text = name + " - " + stoppedMessage;
@@ -40,6 +39,10 @@ namespace SPDIFKA
             this.Resize += new System.EventHandler(this.Form1_Resize);
             runningLabel.Text = stoppedMessage;
             FormBorderStyle = FormBorderStyle.FixedSingle;
+        }
+
+        private void SPDIFKAGUI_Load(object sender, EventArgs e)
+        {
             this.loadState();
         }
 
@@ -68,6 +71,7 @@ namespace SPDIFKA
             IsRunningCheckBox.Checked = UserPrefs.IsRunning;
             IsMinimizeToNotificationCheckbox.Checked = UserPrefs.IsMinimizeToNotificationArea;
             IsMinimizeOnCloseCheckbox.Checked = UserPrefs.IsMinimizedOnClose;
+            this.Location = UserPrefs.WindowPosition;
             if (UserPrefs.SoundType == UserPreferences.Sound.Silent)
             {
                 silent_sound.Checked = true;
@@ -130,7 +134,9 @@ namespace SPDIFKA
             
             spdifka.Visible = true;
             this.minimized_to_notificaton_area();
-            
+            UserPrefs.WindowPosition = Location;
+            UserPrefs.Save();
+
         }
 
         private void minimized_to_notificaton_area()
@@ -157,6 +163,7 @@ namespace SPDIFKA
             this.isAppVisible = true;
             this.WindowState = FormWindowState.Normal;
             this.ShowInTaskbar = true;
+            this.Location = UserPrefs.WindowPosition;
             this.Show();
             this.Activate();
         }
@@ -205,6 +212,11 @@ namespace SPDIFKA
                 }
                 else
                 {
+                    if (WindowState == FormWindowState.Normal)
+                    {
+                        UserPrefs.WindowPosition = Location;
+                        UserPrefs.Save();
+                    }
                     this.exit_application();
                 }
             }

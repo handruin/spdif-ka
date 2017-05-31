@@ -35,22 +35,6 @@ namespace SPDIFKA
             }
         }
 
-        ~AudioControl()
-        {
-            //Dispose(false);
-        }
-
-        //public void Dispose()
-        //{
-        //    Dispose(true);
-        //    GC.SuppressFinalize(this);
-        //}
-
-        //private void Dispose(bool p)
-        //{
-        //    this.sound.Dispose();
-        //}
-
         /// <summary>
         /// Start the audio playback which will keep the SPDIF link alive.
         /// </summary>

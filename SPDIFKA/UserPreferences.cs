@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace SPDIFKA
 {
@@ -14,6 +10,7 @@ namespace SPDIFKA
         public Boolean IsMinimizeToNotificationArea { get; set; }
         public Boolean IsMinimizedOnClose { get; set; }
         public Sound SoundType { get; set; }
+        public System.Drawing.Point WindowPosition { get; set; }
 
         public UserPreferences()
         {
@@ -27,6 +24,7 @@ namespace SPDIFKA
             Properties.Settings.Default.IsMinimizedNotification = this.IsMinimizeToNotificationArea;
             Properties.Settings.Default.IsMinimizedOnClose = this.IsMinimizedOnClose;
             Properties.Settings.Default.SoundType = this.SoundType.ToString();
+            Properties.Settings.Default.WindowPosition = this.WindowPosition;
             Properties.Settings.Default.Save();
         }
 
@@ -36,6 +34,7 @@ namespace SPDIFKA
             this.IsRunning = Properties.Settings.Default.IsRunning;
             this.IsMinimizeToNotificationArea = Properties.Settings.Default.IsMinimizedNotification;
             this.IsMinimizedOnClose = Properties.Settings.Default.IsMinimizedOnClose;
+            this.WindowPosition = Properties.Settings.Default.WindowPosition;
             if (Properties.Settings.Default.SoundType == "Silent")
             {
                 this.SoundType = Sound.Silent;
