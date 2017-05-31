@@ -14,14 +14,16 @@ namespace SPDIFKA
         {
             using (Mutex mutex = new Mutex(false, @"Global\" + "spdif-ka_mutex"))
             {
-                try
-                {
+                try {
                     if (mutex.WaitOne(0, false)) // This is the only instance
                     {
                         Application.EnableVisualStyles();
                         Application.SetCompatibleTextRenderingDefault(false);
                         Application.Run(new SPDIFKAGUI());
                     }
+                }
+                catch (Exception ex) {
+                    MessageBox.Show(ex.ToString());
                 }
                 finally
                 {
