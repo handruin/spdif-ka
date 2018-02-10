@@ -15,7 +15,7 @@ namespace SPDIFKA {
         private static readonly Logger Logger = LogManager.GetCurrentClassLogger();
 
         private WaveOut SoundPlayer;
-        private bool IsIdisposed;
+        private bool IsDisposed;
         private readonly UnmanagedMemoryStream Stream;
         private readonly int DeviceId;
 
@@ -35,25 +35,25 @@ namespace SPDIFKA {
             this.SoundPlayer.Play();
         }
 
-        private void Stop() {
+        private void TryStop() {
             if (this.SoundPlayer != null) {
-                this.SoundPlayer.PlaybackStopped -= this.SoundPlayer_PlaybackStopped;
-                this.SoundPlayer.Stop();
-                this.SoundPlayer.Dispose();
+                try {
+                    this.SoundPlayer.PlaybackStopped -= this.SoundPlayer_PlaybackStopped;
+                    this.SoundPlayer.Stop();
+                    this.SoundPlayer.Dispose();
+                }
+                catch (Exception ex) {
+                    Logger.Error(ex);
+                }
                 this.SoundPlayer = null;
             }
         }
 
         private void SoundPlayer_PlaybackStopped(object sender, StoppedEventArgs e) {
-            if (!this.IsIdisposed) {
+            if (!this.IsDisposed) {
                 Logger.Trace("SoundPlayer_PlaybackStopped");
-                try {
-                    this.Stop();
-                }
-                catch {
-                    //Do nothing
-                }
-                this.Start();
+                this.TryStop();
+                //this.Start();
             }
         }
 
@@ -67,8 +67,8 @@ namespace SPDIFKA {
         }
 
         public void Dispose() {
-            this.IsIdisposed = true;
-            this.Stop();
+            this.IsDisposed = true;
+            this.TryStop();
         }
     }
 
